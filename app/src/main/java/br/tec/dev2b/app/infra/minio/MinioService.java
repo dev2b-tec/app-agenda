@@ -14,7 +14,8 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class MinioService {
 
-    private final MinioClient minioClient;
+    private final MinioClient minioClient;        // internal ops (upload, download, bucket check)
+    private final MinioClient minioClientPublic;   // presigned URL generation (public host = valid signature)
     private final MinioConfig minioConfig;
 
     public String upload(String bucket, String objectName, MultipartFile file) {
@@ -39,13 +40,13 @@ public class MinioService {
     public String gerarUrlTemporaria(String bucket, String objectName, int expiracaoMinutos) {
         log.info("[MinioService.gerarUrlTemporaria] bucket={} objectName={} expiracao={}min", bucket, objectName, expiracaoMinutos);
         try {
-            String url = minioClient.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
+            String url = minioClientPublic.getPresignedObjectUrl(GetPresignedObjectUrlArgs.builder()
                     .method(Method.GET)
                     .bucket(bucket)
                     .object(objectName)
                     .expiry(expiracaoMinutos, TimeUnit.MINUTES)
                     .build());
-            log.info("[MinioService.gerarUrlTemporaria] URL gerada (raw): {}", url);
+            log.info("[MinioService.gerarUrlTemporaria] URL gerada: {}", url);
             return url;
         } catch (Exception e) {
             log.error("[MinioService.gerarUrlTemporaria] erro: bucket={} objectName={} erro={}", bucket, objectName, e.getMessage(), e);
@@ -84,17 +85,9 @@ public class MinioService {
     }
 
     public String getPublicUrl(String bucket, String objectName) {
-        String url = gerarUrlTemporaria(bucket, objectName, 60 * 24 * 7);
-        // Replace internal MinIO host with the public URL so the browser can reach it
-        if (!minioConfig.getUrl().equals(minioConfig.getPublicUrl())) {
-            String before = url;
-            url = url.replace(minioConfig.getUrl(), minioConfig.getPublicUrl());
-            log.info("[MinioService.getPublicUrl] host reescrito: {} -> {}", minioConfig.getUrl(), minioConfig.getPublicUrl());
-            log.debug("[MinioService.getPublicUrl] URL antes={} depois={}", before, url);
-        } else {
-            log.debug("[MinioService.getPublicUrl] minio.url == minio.public-url, nenhuma reescrita necessária");
-        }
-        return url;
+        // minioClientPublic is configured with the public endpoint,
+        // so the generated signature is valid for the URL the browser accesses.
+        return gerarUrlTemporaria(bucket, objectName, 60 * 24 * 7);
     }
 
     public byte[] downloadArquivo(String bucket, String objectName) {

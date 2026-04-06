@@ -74,7 +74,12 @@ public class MinioService {
     }
 
     public String getPublicUrl(String bucket, String objectName) {
-        return gerarUrlTemporaria(bucket, objectName, 60 * 24 * 7);
+        String url = gerarUrlTemporaria(bucket, objectName, 60 * 24 * 7);
+        // Replace internal MinIO host with the public URL so the browser can reach it
+        if (!minioConfig.getUrl().equals(minioConfig.getPublicUrl())) {
+            url = url.replace(minioConfig.getUrl(), minioConfig.getPublicUrl());
+        }
+        return url;
     }
 
     public byte[] downloadArquivo(String bucket, String objectName) {

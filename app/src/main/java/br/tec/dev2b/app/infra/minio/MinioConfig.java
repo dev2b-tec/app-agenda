@@ -13,6 +13,9 @@ public class MinioConfig {
     @Value("${minio.url}")
     private String url;
 
+    @Value("${minio.public-url}")
+    private String publicUrl;
+
     @Value("${minio.access-key}")
     private String accessKey;
 

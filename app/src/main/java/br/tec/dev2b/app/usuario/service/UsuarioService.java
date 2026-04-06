@@ -178,7 +178,7 @@ public class UsuarioService {
         // Store only the object path (not the presigned URL) — presigned URLs expire.
         usuario.setAssinaturaUrl(objectName);
         usuarioRepository.save(usuario);
-        return url;
+        return minioService.getPublicUrl(bucket, objectName);
     }
 
     @Transactional(readOnly = true)

@@ -1,0 +1,22 @@
+CREATE TABLE usuarios (
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    nome              VARCHAR(255)        NOT NULL,
+    email             VARCHAR(255)        NOT NULL UNIQUE,
+    keycloak_id       VARCHAR(255)        UNIQUE,
+    foto_url          TEXT,
+    assinatura_url    TEXT,
+    telefone          VARCHAR(20),
+    cep               VARCHAR(10),
+    logradouro        VARCHAR(255),
+    numero            VARCHAR(20),
+    complemento       VARCHAR(100),
+    bairro            VARCHAR(100),
+    cidade            VARCHAR(100),
+    tipo              VARCHAR(50),
+    conselho          VARCHAR(50),
+    numero_conselho   VARCHAR(50),
+    especialidade     VARCHAR(100),
+    empresa_id        UUID REFERENCES empresas(id),
+    created_at        TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at        TIMESTAMP
+);

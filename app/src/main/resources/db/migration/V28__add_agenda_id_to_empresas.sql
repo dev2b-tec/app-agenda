@@ -1,0 +1,2 @@
+ALTER TABLE empresas
+    ADD COLUMN IF NOT EXISTS agenda_id UUID REFERENCES agendas(id) ON DELETE SET NULL;

@@ -1,0 +1,32 @@
+services:
+  app-agenda:
+    image: ${DOCKER_USERNAME}/app-agenda:${IMAGE_TAG}
+    container_name: app-agenda
+    restart: unless-stopped
+    env_file:
+      - path: .env.app
+        required: false
+    expose:
+      - "8011"
+    networks:
+      - db-net
+      - infra-net
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app-agenda.rule=Host(`agenda-api.dev2b.tec.br`)"
+      - "traefik.http.routers.app-agenda.entrypoints=websecure"
+      - "traefik.http.routers.app-agenda.tls=true"
+      - "traefik.http.routers.app-agenda.tls.certresolver=letsencrypt"
+      - "traefik.http.services.app-agenda.loadbalancer.server.port=8011"
+
+networks:
+  db-net:
+    external: true
+    name: db-net
+  infra-net:
+    external: true
+    name: infra-net
+  proxy:
+    external: true
+    name: proxy

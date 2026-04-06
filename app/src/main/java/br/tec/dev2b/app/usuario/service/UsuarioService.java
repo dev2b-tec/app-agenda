@@ -154,12 +154,14 @@ public class UsuarioService {
         minioService.upload(bucket, objectName, file);
         log.info("[uploadFoto] Upload para MinIO concluído");
 
-        String url = minioService.getPublicUrl(bucket, objectName);
-        log.info("[uploadFoto] URL pública gerada: {}", url);
-
-        usuario.setFotoUrl(url);
+        // Store only the object path (not the presigned URL) — presigned URLs expire.
+        // The /foto-url endpoint generates a fresh URL on demand.
+        usuario.setFotoUrl(objectName);
         usuarioRepository.save(usuario);
-        log.info("[uploadFoto] fotoUrl salva no banco para usuário id={}", id);
+        log.info("[uploadFoto] objectName salvo no banco para usuário id={}", id);
+
+        String url = minioService.getPublicUrl(bucket, objectName);
+        log.info("[uploadFoto] URL pública gerada para resposta: {}", url);
         return url;
     }
 
@@ -173,9 +175,8 @@ public class UsuarioService {
         String bucket = minioService.getBucketDocumentos();
 
         minioService.upload(bucket, objectName, file);
-        String url = minioService.getPublicUrl(bucket, objectName);
-
-        usuario.setAssinaturaUrl(url);
+        // Store only the object path (not the presigned URL) — presigned URLs expire.
+        usuario.setAssinaturaUrl(objectName);
         usuarioRepository.save(usuario);
         return url;
     }
@@ -196,7 +197,12 @@ public class UsuarioService {
         }
         log.debug("[obterFotoUrl] fotoUrl armazenada no banco: {}", usuario.getFotoUrl());
 
-        String objectName = "usuarios/" + id + "/foto" + obterExtensaoUrl(usuario.getFotoUrl());
+        // fotoUrl may be a plain objectName (new records) or a legacy presigned URL (old records).
+        // In both cases obterExtensaoUrl extracts the extension correctly.
+        String fotoRef = usuario.getFotoUrl();
+        String objectName = fotoRef.startsWith("usuarios/") && !fotoRef.contains("?") 
+                ? fotoRef  // already an objectName
+                : "usuarios/" + id + "/foto" + obterExtensaoUrl(fotoRef); // legacy presigned URL
         String bucket = minioService.getBucketFotos();
         log.info("[obterFotoUrl] Gerando URL pública para bucket={} objectName={}", bucket, objectName);
 

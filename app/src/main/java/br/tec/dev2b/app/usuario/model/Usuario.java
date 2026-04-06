@@ -83,6 +83,7 @@ public class Usuario {
     @Column(name = "tempo_antecedencia")
     private String tempoAntecedencia;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean disponivel = true;
 

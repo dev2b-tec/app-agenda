@@ -1,0 +1,866 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-04-05",
+  "__export_source": "app-agenda",
+  "resources": [
+    {
+      "_type": "environment",
+      "_id": "env_base",
+      "parentId": "wrk_1",
+      "name": "Local",
+      "data": {
+        "base_url": "http://localhost:8011",
+        "empresa_id": "00000000-0000-0000-0000-000000000001",
+        "usuario_id": "00000000-0000-0000-0000-000000000002",
+        "paciente_id": "00000000-0000-0000-0000-000000000003",
+        "agenda_id": "00000000-0000-0000-0000-000000000004",
+        "agendamento_id": "00000000-0000-0000-0000-000000000005"
+      },
+      "color": null,
+      "isPrivate": false
+    },
+    {
+      "_type": "workspace",
+      "_id": "wrk_1",
+      "parentId": null,
+      "name": "app-agenda",
+      "description": "API REST — Spring Boot :8011"
+    },
+
+    { "_type": "request_group", "_id": "fld_agendas",        "parentId": "wrk_1", "name": "Agendas" },
+    { "_type": "request_group", "_id": "fld_agendamentos",   "parentId": "wrk_1", "name": "Agendamentos" },
+    { "_type": "request_group", "_id": "fld_usuarios",       "parentId": "wrk_1", "name": "Usuários" },
+    { "_type": "request_group", "_id": "fld_empresas",       "parentId": "wrk_1", "name": "Empresas" },
+    { "_type": "request_group", "_id": "fld_pacientes",      "parentId": "wrk_1", "name": "Pacientes" },
+    { "_type": "request_group", "_id": "fld_financeiro",     "parentId": "wrk_1", "name": "Financeiro" },
+    { "_type": "request_group", "_id": "fld_anamneses",      "parentId": "wrk_1", "name": "Anamneses" },
+    { "_type": "request_group", "_id": "fld_documentos",     "parentId": "wrk_1", "name": "Documentos" },
+    { "_type": "request_group", "_id": "fld_evolucoes",      "parentId": "wrk_1", "name": "Evoluções" },
+    { "_type": "request_group", "_id": "fld_mensagens",      "parentId": "wrk_1", "name": "Mensagens Padrão" },
+    { "_type": "request_group", "_id": "fld_cfg_mensagens",  "parentId": "wrk_1", "name": "Config. Mensagens" },
+    { "_type": "request_group", "_id": "fld_unidades",       "parentId": "wrk_1", "name": "Unidades" },
+    { "_type": "request_group", "_id": "fld_salas",          "parentId": "wrk_1", "name": "Salas" },
+    { "_type": "request_group", "_id": "fld_servicos",       "parentId": "wrk_1", "name": "Serviços" },
+    { "_type": "request_group", "_id": "fld_creditos",       "parentId": "wrk_1", "name": "Créditos" },
+    { "_type": "request_group", "_id": "fld_dashboard",      "parentId": "wrk_1", "name": "Dashboard" },
+    { "_type": "request_group", "_id": "fld_senhas",         "parentId": "wrk_1", "name": "Senhas" },
+    { "_type": "request_group", "_id": "fld_linha_tempo",    "parentId": "wrk_1", "name": "Linha do Tempo" },
+    { "_type": "request_group", "_id": "fld_site_config",    "parentId": "wrk_1", "name": "Site Config" },
+    { "_type": "request_group", "_id": "fld_nfse",           "parentId": "wrk_1", "name": "NFS-e" },
+    { "_type": "request_group", "_id": "fld_cnae",           "parentId": "wrk_1", "name": "CNAE" },
+
+    {
+      "_type": "request", "_id": "req_agendas_list", "parentId": "fld_agendas",
+      "name": "Listar agendas", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/agendas",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_agendas_get", "parentId": "fld_agendas",
+      "name": "Buscar agenda por ID", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/agendas/{{ _.agenda_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_agendas_create", "parentId": "fld_agendas",
+      "name": "Criar agenda", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/agendas",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"nome\": \"Agenda Principal\",\n  \"empresaId\": \"{{ _.empresa_id }}\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_agendas_patch", "parentId": "fld_agendas",
+      "name": "Atualizar agenda", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/agendas/{{ _.agenda_id }}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"nome\": \"Novo Nome\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_agendas_delete", "parentId": "fld_agendas",
+      "name": "Remover agenda", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/agendas/{{ _.agenda_id }}",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_agendamentos_create", "parentId": "fld_agendamentos",
+      "name": "Criar agendamento", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/agendamentos",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"pacienteId\": \"{{ _.paciente_id }}\",\n  \"usuarioId\": \"{{ _.usuario_id }}\",\n  \"empresaId\": \"{{ _.empresa_id }}\",\n  \"dataHoraInicio\": \"2026-04-10T09:00:00\",\n  \"dataHoraFim\": \"2026-04-10T10:00:00\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_agendamentos_list", "parentId": "fld_agendamentos",
+      "name": "Listar por empresa", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/agendamentos/empresa/{{ _.empresa_id }}",
+      "parameters": [
+        { "name": "inicio", "value": "2026-04-01", "disabled": true },
+        { "name": "fim",    "value": "2026-04-30", "disabled": true }
+      ],
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_agendamentos_get", "parentId": "fld_agendamentos",
+      "name": "Buscar agendamento por ID", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/agendamentos/{{ _.agendamento_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_agendamentos_patch", "parentId": "fld_agendamentos",
+      "name": "Atualizar agendamento", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/agendamentos/{{ _.agendamento_id }}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"status\": \"CONFIRMADO\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_agendamentos_delete", "parentId": "fld_agendamentos",
+      "name": "Remover agendamento", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/agendamentos/{{ _.agendamento_id }}",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_usuarios_create", "parentId": "fld_usuarios",
+      "name": "Criar usuário", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/usuarios",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"nome\": \"Dr. João Silva\",\n  \"email\": \"joao@clinica.com.br\",\n  \"empresaId\": \"{{ _.empresa_id }}\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_usuarios_sync", "parentId": "fld_usuarios",
+      "name": "Sync Keycloak", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/usuarios/sync",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"keycloakId\": \"kc-uuid-aqui\",\n  \"email\": \"joao@clinica.com.br\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_usuarios_list", "parentId": "fld_usuarios",
+      "name": "Listar todos", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/usuarios",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_usuarios_list_empresa", "parentId": "fld_usuarios",
+      "name": "Listar por empresa", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/usuarios/empresa/{{ _.empresa_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_usuarios_get", "parentId": "fld_usuarios",
+      "name": "Buscar por ID", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/usuarios/{{ _.usuario_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_usuarios_get_email", "parentId": "fld_usuarios",
+      "name": "Buscar por email", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/usuarios/email/joao@clinica.com.br",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_usuarios_get_keycloak", "parentId": "fld_usuarios",
+      "name": "Buscar por Keycloak ID", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/usuarios/keycloak/kc-uuid-aqui",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_usuarios_patch", "parentId": "fld_usuarios",
+      "name": "Atualizar usuário", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/usuarios/{{ _.usuario_id }}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"nome\": \"Dr. João Atualizado\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_usuarios_agenda_prof", "parentId": "fld_usuarios",
+      "name": "Atualizar agenda profissional", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/usuarios/{{ _.usuario_id }}/agenda-profissional",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"agendaId\": \"{{ _.agenda_id }}\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_usuarios_delete", "parentId": "fld_usuarios",
+      "name": "Remover usuário", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/usuarios/{{ _.usuario_id }}",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_empresas_create", "parentId": "fld_empresas",
+      "name": "Criar empresa", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/empresas",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"razaoSocial\": \"Clínica Exemplo Ltda\",\n  \"cnpj\": \"00.000.000/0001-00\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_empresas_list", "parentId": "fld_empresas",
+      "name": "Listar empresas", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/empresas",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_empresas_get", "parentId": "fld_empresas",
+      "name": "Buscar por ID", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/empresas/{{ _.empresa_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_empresas_patch", "parentId": "fld_empresas",
+      "name": "Atualizar empresa", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/empresas/{{ _.empresa_id }}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"razaoSocial\": \"Clínica Atualizada Ltda\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_empresas_delete", "parentId": "fld_empresas",
+      "name": "Remover empresa", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/empresas/{{ _.empresa_id }}",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_pacientes_create", "parentId": "fld_pacientes",
+      "name": "Criar paciente", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/pacientes",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"nome\": \"Maria Souza\",\n  \"cpf\": \"000.000.000-00\",\n  \"dataNascimento\": \"1990-01-15\",\n  \"telefone\": \"81999999999\",\n  \"email\": \"maria@email.com\",\n  \"empresaId\": \"{{ _.empresa_id }}\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_pacientes_list", "parentId": "fld_pacientes",
+      "name": "Listar por empresa", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/pacientes/empresa/{{ _.empresa_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_pacientes_buscar", "parentId": "fld_pacientes",
+      "name": "Buscar por nome/CPF", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/pacientes/empresa/{{ _.empresa_id }}/buscar",
+      "parameters": [{ "name": "q", "value": "maria" }],
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_pacientes_status", "parentId": "fld_pacientes",
+      "name": "Listar por status", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/pacientes/empresa/{{ _.empresa_id }}/status/ATIVO",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_pacientes_get", "parentId": "fld_pacientes",
+      "name": "Buscar por ID", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/pacientes/{{ _.paciente_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_pacientes_patch", "parentId": "fld_pacientes",
+      "name": "Atualizar paciente", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/pacientes/{{ _.paciente_id }}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"telefone\": \"81988888888\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_pacientes_delete", "parentId": "fld_pacientes",
+      "name": "Remover paciente", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/pacientes/{{ _.paciente_id }}",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_fin_create", "parentId": "fld_financeiro",
+      "name": "Criar movimento", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/movimentos-financeiros",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"empresaId\": \"{{ _.empresa_id }}\",\n  \"pacienteId\": \"{{ _.paciente_id }}\",\n  \"tipo\": \"RECEITA\",\n  \"valor\": 150.00,\n  \"descricao\": \"Consulta\",\n  \"dataVencimento\": \"2026-04-15\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_fin_list", "parentId": "fld_financeiro",
+      "name": "Listar por empresa", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/movimentos-financeiros/empresa/{{ _.empresa_id }}",
+      "parameters": [{ "name": "tipo", "value": "RECEITA", "disabled": true }],
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_fin_list_paciente", "parentId": "fld_financeiro",
+      "name": "Listar por paciente", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/movimentos-financeiros/paciente/{{ _.paciente_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_fin_patch", "parentId": "fld_financeiro",
+      "name": "Atualizar movimento", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/movimentos-financeiros/ID_MOVIMENTO",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"status\": \"PAGO\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_fin_del_parcela", "parentId": "fld_financeiro",
+      "name": "Deletar parcela", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/movimentos-financeiros/ID_MOVIMENTO/parcela",
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_fin_del_grupo", "parentId": "fld_financeiro",
+      "name": "Deletar grupo", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/movimentos-financeiros/grupo/ID_GRUPO",
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_fin_del_futuras", "parentId": "fld_financeiro",
+      "name": "Deletar parcelas futuras", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/movimentos-financeiros/ID_MOVIMENTO/futuras",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_anamnese_create", "parentId": "fld_anamneses",
+      "name": "Criar anamnese", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/anamneses",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"titulo\": \"Anamnese Geral\",\n  \"empresaId\": \"{{ _.empresa_id }}\",\n  \"perguntas\": []\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_anamnese_list", "parentId": "fld_anamneses",
+      "name": "Listar por empresa", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/anamneses/empresa/{{ _.empresa_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_anamnese_get", "parentId": "fld_anamneses",
+      "name": "Buscar por ID", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/anamneses/ID_ANAMNESE",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_anamnese_patch", "parentId": "fld_anamneses",
+      "name": "Atualizar anamnese", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/anamneses/ID_ANAMNESE",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"titulo\": \"Anamnese Atualizada\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_anamnese_delete", "parentId": "fld_anamneses",
+      "name": "Remover anamnese", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/anamneses/ID_ANAMNESE",
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_resposta_get", "parentId": "fld_anamneses",
+      "name": "Buscar respostas", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/respostas-anamnese/paciente/{{ _.paciente_id }}/anamnese/ID_ANAMNESE",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_resposta_create", "parentId": "fld_anamneses",
+      "name": "Salvar respostas", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/respostas-anamnese",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"pacienteId\": \"{{ _.paciente_id }}\",\n  \"anamneseId\": \"ID_ANAMNESE\",\n  \"respostas\": []\n}" }
+    },
+
+    {
+      "_type": "request", "_id": "req_doc_list", "parentId": "fld_documentos",
+      "name": "Listar por paciente", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/documentos/paciente/{{ _.paciente_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_doc_get", "parentId": "fld_documentos",
+      "name": "Buscar por ID", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/documentos/ID_DOCUMENTO",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_doc_create", "parentId": "fld_documentos",
+      "name": "Criar documento", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/documentos",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"pacienteId\": \"{{ _.paciente_id }}\",\n  \"usuarioId\": \"{{ _.usuario_id }}\",\n  \"tipo\": \"ATESTADO\",\n  \"conteudo\": \"Conteúdo do documento\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_doc_put", "parentId": "fld_documentos",
+      "name": "Atualizar documento", "method": "PUT",
+      "url": "{{ _.base_url }}/api/v1/documentos/ID_DOCUMENTO",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"conteudo\": \"Conteúdo atualizado\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_doc_delete", "parentId": "fld_documentos",
+      "name": "Remover documento", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/documentos/ID_DOCUMENTO",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_evo_create", "parentId": "fld_evolucoes",
+      "name": "Criar evolução", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/evolucoes",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"pacienteId\": \"{{ _.paciente_id }}\",\n  \"usuarioId\": \"{{ _.usuario_id }}\",\n  \"texto\": \"Paciente evoluiu bem.\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_evo_list", "parentId": "fld_evolucoes",
+      "name": "Listar por paciente", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/evolucoes/paciente/{{ _.paciente_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_evo_get", "parentId": "fld_evolucoes",
+      "name": "Buscar por ID", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/evolucoes/ID_EVOLUCAO",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_evo_patch", "parentId": "fld_evolucoes",
+      "name": "Atualizar evolução", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/evolucoes/ID_EVOLUCAO",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"texto\": \"Texto corrigido\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_evo_delete", "parentId": "fld_evolucoes",
+      "name": "Remover evolução", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/evolucoes/ID_EVOLUCAO",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_msg_list", "parentId": "fld_mensagens",
+      "name": "Listar por empresa", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/mensagens-padrao/empresa/{{ _.empresa_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_msg_get", "parentId": "fld_mensagens",
+      "name": "Buscar por tipo", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/mensagens-padrao/empresa/{{ _.empresa_id }}/tipo/CONFIRMAR_AGENDAMENTO",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_msg_put", "parentId": "fld_mensagens",
+      "name": "Salvar mensagem (upsert)", "method": "PUT",
+      "url": "{{ _.base_url }}/api/v1/mensagens-padrao/empresa/{{ _.empresa_id }}/tipo/CONFIRMAR_AGENDAMENTO",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"texto\": \"Sua consulta com #nome_profissional# está confirmada para #data_e_hora_agendamento#.\"\n}" }
+    },
+
+    {
+      "_type": "request", "_id": "req_cfg_msg_get", "parentId": "fld_cfg_mensagens",
+      "name": "Buscar configuração", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/configuracoes-mensagens/usuario/{{ _.usuario_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_cfg_msg_put", "parentId": "fld_cfg_mensagens",
+      "name": "Salvar configuração", "method": "PUT",
+      "url": "{{ _.base_url }}/api/v1/configuracoes-mensagens/usuario/{{ _.usuario_id }}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"numeroWhatsapp\": \"5581999999999\",\n  \"permitirProfissionais\": false,\n  \"envioSmsAutomatico\": true,\n  \"enviarComRiscoFalta\": false,\n  \"horarioDisparo\": \"TODO_DIA_8AM\"\n}" }
+    },
+
+    {
+      "_type": "request", "_id": "req_unidades_create", "parentId": "fld_unidades",
+      "name": "Criar unidade", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/unidades",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"nome\": \"Unidade Centro\",\n  \"empresaId\": \"{{ _.empresa_id }}\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_unidades_list", "parentId": "fld_unidades",
+      "name": "Listar por empresa", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/unidades/empresa/{{ _.empresa_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_unidades_ativas", "parentId": "fld_unidades",
+      "name": "Listar ativas", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/unidades/empresa/{{ _.empresa_id }}/ativas",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_unidades_patch", "parentId": "fld_unidades",
+      "name": "Atualizar unidade", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/unidades/ID_UNIDADE",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"nome\": \"Unidade Norte\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_unidades_delete", "parentId": "fld_unidades",
+      "name": "Remover unidade", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/unidades/ID_UNIDADE",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_salas_create", "parentId": "fld_salas",
+      "name": "Criar sala", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/salas",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"nome\": \"Sala 1\",\n  \"empresaId\": \"{{ _.empresa_id }}\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_salas_list", "parentId": "fld_salas",
+      "name": "Listar por empresa", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/salas/empresa/{{ _.empresa_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_salas_ativas", "parentId": "fld_salas",
+      "name": "Listar ativas", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/salas/empresa/{{ _.empresa_id }}/ativas",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_salas_patch", "parentId": "fld_salas",
+      "name": "Atualizar sala", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/salas/ID_SALA",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"nome\": \"Sala 2\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_salas_delete", "parentId": "fld_salas",
+      "name": "Remover sala", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/salas/ID_SALA",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_servicos_create", "parentId": "fld_servicos",
+      "name": "Criar serviço", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/servicos",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"nome\": \"Consulta\",\n  \"tipo\": \"CONSULTA\",\n  \"duracao\": 60,\n  \"valor\": 200.00,\n  \"empresaId\": \"{{ _.empresa_id }}\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_servicos_list", "parentId": "fld_servicos",
+      "name": "Listar por empresa", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/servicos/empresa/{{ _.empresa_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_servicos_ativos", "parentId": "fld_servicos",
+      "name": "Listar ativos", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/servicos/empresa/{{ _.empresa_id }}/ativos",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_servicos_tipo", "parentId": "fld_servicos",
+      "name": "Listar por tipo", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/servicos/empresa/{{ _.empresa_id }}/tipo/CONSULTA",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_servicos_patch", "parentId": "fld_servicos",
+      "name": "Atualizar serviço", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/servicos/ID_SERVICO",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"valor\": 250.00\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_servicos_delete", "parentId": "fld_servicos",
+      "name": "Remover serviço", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/servicos/ID_SERVICO",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_creditos_comprar", "parentId": "fld_creditos",
+      "name": "Comprar créditos", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/creditos/comprar",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"usuarioId\": \"{{ _.usuario_id }}\",\n  \"quantidade\": 100\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_creditos_historico", "parentId": "fld_creditos",
+      "name": "Histórico", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/creditos/historico/usuario/{{ _.usuario_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_creditos_saldo", "parentId": "fld_creditos",
+      "name": "Saldo", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/creditos/saldo/usuario/{{ _.usuario_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_dashboard", "parentId": "fld_dashboard",
+      "name": "Dados da empresa", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/dashboard/empresa/{{ _.empresa_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_senhas_create", "parentId": "fld_senhas",
+      "name": "Criar senha", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/senhas",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"usuarioId\": \"{{ _.usuario_id }}\",\n  \"tipo\": \"DOCUMENTO\",\n  \"descricao\": \"Senha do sistema X\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_senhas_list", "parentId": "fld_senhas",
+      "name": "Listar por usuário", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/senhas/usuario/{{ _.usuario_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_senhas_tipo", "parentId": "fld_senhas",
+      "name": "Listar por tipo", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/senhas/usuario/{{ _.usuario_id }}/tipo/DOCUMENTO",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_senhas_patch", "parentId": "fld_senhas",
+      "name": "Atualizar senha", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/senhas/ID_SENHA",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"descricao\": \"Nova descrição\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_senhas_delete", "parentId": "fld_senhas",
+      "name": "Remover senha", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/senhas/ID_SENHA",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_linha_tempo", "parentId": "fld_linha_tempo",
+      "name": "Linha do tempo do paciente", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/linha-do-tempo/paciente/{{ _.paciente_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_site_get", "parentId": "fld_site_config",
+      "name": "Buscar configuração", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/site-config/usuario/{{ _.usuario_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_site_put", "parentId": "fld_site_config",
+      "name": "Salvar configuração", "method": "PUT",
+      "url": "{{ _.base_url }}/api/v1/site-config/usuario/{{ _.usuario_id }}",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"titulo\": \"Minha Clínica\",\n  \"descricao\": \"Atendimento especializado\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_site_blog_create", "parentId": "fld_site_config",
+      "name": "Criar post blog", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/site-config/usuario/{{ _.usuario_id }}/blog",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"titulo\": \"Novo post\",\n  \"conteudo\": \"Conteúdo do post\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_site_blog_delete", "parentId": "fld_site_config",
+      "name": "Remover post blog", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/site-config/blog/ID_POST",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_nfse_get", "parentId": "fld_nfse",
+      "name": "Buscar configuração NFS-e", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/configuracoes-nfse/empresa/{{ _.empresa_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_nfse_cnpj", "parentId": "fld_nfse",
+      "name": "Consultar CNPJ", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/configuracoes-nfse/consultar-cnpj",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"cnpj\": \"00.000.000/0001-00\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_nfse_delete", "parentId": "fld_nfse",
+      "name": "Remover configuração NFS-e", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/configuracoes-nfse/empresa/{{ _.empresa_id }}",
+      "body": {}
+    },
+
+    {
+      "_type": "request", "_id": "req_cnae_create", "parentId": "fld_cnae",
+      "name": "Criar CNAE", "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/cnae",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"codigo\": \"8630-5/01\",\n  \"descricao\": \"Atividade médica ambulatorial\",\n  \"empresaId\": \"{{ _.empresa_id }}\"\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_cnae_list", "parentId": "fld_cnae",
+      "name": "Listar por empresa", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/cnae/empresa/{{ _.empresa_id }}",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_cnae_ativos", "parentId": "fld_cnae",
+      "name": "Listar ativos", "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/cnae/empresa/{{ _.empresa_id }}/ativos",
+      "headers": [{ "name": "Accept", "value": "application/json" }],
+      "body": {}
+    },
+    {
+      "_type": "request", "_id": "req_cnae_patch", "parentId": "fld_cnae",
+      "name": "Atualizar CNAE", "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/cnae/ID_CNAE",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "Accept", "value": "application/json" }
+      ],
+      "body": { "mimeType": "application/json", "text": "{\n  \"ativo\": false\n}" }
+    },
+    {
+      "_type": "request", "_id": "req_cnae_delete", "parentId": "fld_cnae",
+      "name": "Remover CNAE", "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/cnae/ID_CNAE",
+      "body": {}
+    }
+  ]
+}

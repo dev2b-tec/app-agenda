@@ -198,10 +198,10 @@ public class UsuarioService {
 
         String objectName = "usuarios/" + id + "/foto" + obterExtensaoUrl(usuario.getFotoUrl());
         String bucket = minioService.getBucketFotos();
-        log.info("[obterFotoUrl] Gerando URL temporária para bucket={} objectName={}", bucket, objectName);
+        log.info("[obterFotoUrl] Gerando URL pública para bucket={} objectName={}", bucket, objectName);
 
-        String url = minioService.gerarUrlTemporaria(bucket, objectName, 60 * 24 * 7);
-        log.info("[obterFotoUrl] URL temporária gerada: {}", url);
+        String url = minioService.getPublicUrl(bucket, objectName);
+        log.info("[obterFotoUrl] URL pública gerada: {}", url);
         return url;
     }
 

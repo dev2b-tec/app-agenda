@@ -6,6 +6,7 @@ import br.tec.dev2b.app.usuario.dto.SyncUsuarioDto;
 import br.tec.dev2b.app.usuario.dto.UsuarioDto;
 import br.tec.dev2b.app.usuario.service.UsuarioService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/usuarios")
 @RequiredArgsConstructor
@@ -68,13 +70,17 @@ public class UsuarioController {
     public ResponseEntity<Map<String, String>> uploadFoto(
             @PathVariable UUID id,
             @RequestParam("file") MultipartFile file) {
+        log.info("[POST /{}/foto] contentType={} size={}", id, file.getContentType(), file.getSize());
         String url = usuarioService.uploadFoto(id, file);
+        log.info("[POST /{}/foto] concluído, url={}", id, url);
         return ResponseEntity.ok(Map.of("fotoUrl", url));
     }
 
     @GetMapping("/{id}/foto-url")
     public ResponseEntity<Map<String, String>> obterFotoUrl(@PathVariable UUID id) {
+        log.info("[GET /{}/foto-url] solicitado", id);
         String url = usuarioService.obterFotoUrl(id);
+        log.info("[GET /{}/foto-url] url gerada={}", id, url);
         return ResponseEntity.ok(Map.of("fotoUrl", url));
     }
 

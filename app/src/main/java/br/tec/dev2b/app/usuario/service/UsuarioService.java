@@ -10,6 +10,7 @@ import br.tec.dev2b.app.usuario.dto.UsuarioDto;
 import br.tec.dev2b.app.usuario.model.Usuario;
 import br.tec.dev2b.app.usuario.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UsuarioService {
@@ -133,18 +135,31 @@ public class UsuarioService {
 
     @Transactional
     public String uploadFoto(UUID id, MultipartFile file) {
+        log.info("[uploadFoto] Iniciando upload de foto para usuário id={}", id);
+        log.debug("[uploadFoto] Arquivo recebido: nome={}, tamanho={} bytes, contentType={}",
+                file.getOriginalFilename(), file.getSize(), file.getContentType());
+
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado: " + id));
+                .orElseThrow(() -> {
+                    log.warn("[uploadFoto] Usuário não encontrado: id={}", id);
+                    return new IllegalArgumentException("Usuário não encontrado: " + id);
+                });
+        log.debug("[uploadFoto] Usuário encontrado: email={}", usuario.getEmail());
 
         String ext = obterExtensao(file.getOriginalFilename());
         String objectName = "usuarios/" + id + "/foto" + ext;
         String bucket = minioService.getBucketFotos();
+        log.info("[uploadFoto] Enviando para MinIO bucket={} objectName={}", bucket, objectName);
 
         minioService.upload(bucket, objectName, file);
+        log.info("[uploadFoto] Upload para MinIO concluído");
+
         String url = minioService.getPublicUrl(bucket, objectName);
+        log.info("[uploadFoto] URL pública gerada: {}", url);
 
         usuario.setFotoUrl(url);
         usuarioRepository.save(usuario);
+        log.info("[uploadFoto] fotoUrl salva no banco para usuário id={}", id);
         return url;
     }
 
@@ -167,15 +182,27 @@ public class UsuarioService {
 
     @Transactional(readOnly = true)
     public String obterFotoUrl(UUID id) {
+        log.info("[obterFotoUrl] Buscando URL de foto para usuário id={}", id);
+
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado: " + id));
-        
+                .orElseThrow(() -> {
+                    log.warn("[obterFotoUrl] Usuário não encontrado: id={}", id);
+                    return new IllegalArgumentException("Usuário não encontrado: " + id);
+                });
+
         if (usuario.getFotoUrl() == null || usuario.getFotoUrl().isEmpty()) {
+            log.warn("[obterFotoUrl] Usuário id={} não possui foto cadastrada", id);
             throw new IllegalArgumentException("Usuário não possui foto cadastrada");
         }
-        
+        log.debug("[obterFotoUrl] fotoUrl armazenada no banco: {}", usuario.getFotoUrl());
+
         String objectName = "usuarios/" + id + "/foto" + obterExtensaoUrl(usuario.getFotoUrl());
-        return minioService.gerarUrlTemporaria(minioService.getBucketFotos(), objectName, 60 * 24 * 7);
+        String bucket = minioService.getBucketFotos();
+        log.info("[obterFotoUrl] Gerando URL temporária para bucket={} objectName={}", bucket, objectName);
+
+        String url = minioService.gerarUrlTemporaria(bucket, objectName, 60 * 24 * 7);
+        log.info("[obterFotoUrl] URL temporária gerada: {}", url);
+        return url;
     }
 
     private String obterExtensaoUrl(String url) {

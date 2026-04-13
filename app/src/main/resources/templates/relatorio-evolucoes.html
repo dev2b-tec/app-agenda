@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Evoluções do Paciente</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 10pt;
+            margin: 20px;
+            color: #333333;
+            background: #ffffff;
+        }
+
+        /* ── Page header (paciente + logo) ── */
+        table.page-header {
+            width: 100%;
+            margin-bottom: 14px;
+            border-collapse: collapse;
+        }
+        .paciente-nome {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #333333;
+            vertical-align: middle;
+        }
+        .logo-cell {
+            text-align: right;
+            vertical-align: middle;
+        }
+        .logo-cell img {
+            max-height: 52px;
+            max-width: 140px;
+        }
+        .empresa-nome {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #555555;
+        }
+
+        /* ── Atendimento card ── */
+        .evolucao-block {
+            page-break-before: always;
+            margin-bottom: 0;
+        }
+        .evolucao-block.first-block {
+            page-break-before: avoid;
+        }
+
+        table.atendimento-header {
+            width: 100%;
+            background-color: #4A6FA5;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        .atendimento-num {
+            color: #ffffff;
+            font-size: 13pt;
+            font-weight: bold;
+            padding: 8px 14px;
+            vertical-align: middle;
+        }
+        .atendimento-date {
+            color: #ffffff;
+            font-size: 10pt;
+            text-align: right;
+            padding: 8px 14px;
+            vertical-align: middle;
+        }
+
+        /* ── Professional info ── */
+        .info-row {
+            margin-bottom: 6px;
+            font-size: 10pt;
+        }
+        .info-label {
+            font-weight: bold;
+        }
+
+        /* ── Sections ── */
+        .section-title {
+            font-size: 11pt;
+            font-weight: bold;
+            color: #4A6FA5;
+            margin-top: 12px;
+            margin-bottom: 4px;
+        }
+        .section-content {
+            font-size: 10pt;
+            margin-bottom: 6px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .section-divider {
+            border: none;
+            border-top: 1px solid #DDDDDD;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div th:each="ev, status : ${evolucoes}">
+    <div th:class="${status.first} ? 'evolucao-block first-block' : 'evolucao-block'">
+
+        <!-- Page header: patient name + logo -->
+        <table class="page-header" cellspacing="0" cellpadding="0">
+            <tr>
+                <td class="paciente-nome" th:text="'Paciente: ' + ${pacienteNome}">Paciente: Nome</td>
+                <td class="logo-cell">
+                    <img th:if="${logoUrl != null and !#strings.isEmpty(logoUrl)}"
+                         th:src="${logoUrl}" alt="Logo"/>
+                    <span th:if="${logoUrl == null or #strings.isEmpty(logoUrl)}"
+                          class="empresa-nome" th:text="${empresaNome}">Empresa</span>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Atendimento header -->
+        <table class="atendimento-header" cellspacing="0" cellpadding="0">
+            <tr>
+                <td class="atendimento-num" th:text="${ev.ordem} + '° ATENDIMENTO'">1° ATENDIMENTO</td>
+                <td class="atendimento-date" th:text="'Data: ' + ${ev.data}">Data: 01/01/2025</td>
+            </tr>
+        </table>
+
+        <!-- Professional info -->
+        <div class="info-row">
+            <span class="info-label">Profissional: </span>
+            <span th:text="${ev.profissional}">Profissional</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">Título: </span>
+            <span th:text="${ev.titulo != null ? ev.titulo : '-'}">Título</span>
+        </div>
+
+        <!-- Resumo AI -->
+        <div th:if="${ev.resumoAi != null and !#strings.isEmpty(ev.resumoAi)}">
+            <div class="section-title">Resumo AI</div>
+            <div class="section-content" th:text="${ev.resumoAi}">resumo</div>
+            <hr class="section-divider"/>
+        </div>
+
+        <!-- Comentários Gerais -->
+        <div th:if="${ev.comentariosGerais != null and !#strings.isEmpty(ev.comentariosGerais)}">
+            <div class="section-title">Comentários Gerais</div>
+            <div class="section-content" th:text="${ev.comentariosGerais}">comentarios</div>
+            <hr class="section-divider"/>
+        </div>
+
+        <!-- Exames Realizados -->
+        <div th:if="${ev.examesRealizados != null and !#strings.isEmpty(ev.examesRealizados)}">
+            <div class="section-title">Exames Realizados</div>
+            <div class="section-content" th:text="${ev.examesRealizados}">exames</div>
+            <hr class="section-divider"/>
+        </div>
+
+        <!-- Prescrições -->
+        <div th:if="${ev.prescricao != null and !#strings.isEmpty(ev.prescricao)}">
+            <div class="section-title">Prescrições</div>
+            <div class="section-content" th:text="${ev.prescricao}">prescricao</div>
+            <hr class="section-divider"/>
+        </div>
+
+        <!-- Conduta -->
+        <div th:if="${ev.conduta != null and !#strings.isEmpty(ev.conduta)}">
+            <div class="section-title">Conduta</div>
+            <div class="section-content" th:text="${ev.conduta}">conduta</div>
+            <hr class="section-divider"/>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

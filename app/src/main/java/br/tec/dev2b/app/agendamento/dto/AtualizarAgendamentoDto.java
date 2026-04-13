@@ -11,6 +11,7 @@ import java.util.UUID;
 @Data
 public class AtualizarAgendamentoDto {
     private UUID pacienteId;
+    private String titulo;
     private UUID usuarioId;
     private LocalDateTime inicio;
     private LocalDateTime fim;
@@ -24,4 +25,5 @@ public class AtualizarAgendamentoDto {
     private BigDecimal valorRecebido;
     private LocalDate dataPagamento;
     private String metodoPagamento;
+    private Boolean atendimentoRemoto;
 }

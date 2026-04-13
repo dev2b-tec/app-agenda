@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 public class AgendamentoDto {
     private UUID id;
     private UUID empresaId;
+    private String tipo;
+    private String titulo;
     private UUID pacienteId;
     private String pacienteNome;
     private UUID usuarioId;
@@ -33,11 +35,17 @@ public class AgendamentoDto {
     private String metodoPagamento;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String wherebyMeetingId;
+    private String wherebyHostUrl;
+    private String wherebyViewerUrl;
+    private Boolean atendimentoRemoto;
 
     public static AgendamentoDto from(Agendamento a) {
         AgendamentoDto dto = new AgendamentoDto();
         dto.id           = a.getId();
         dto.empresaId    = a.getEmpresa() != null ? a.getEmpresa().getId() : null;
+        dto.tipo         = a.getTipo();
+        dto.titulo       = a.getTitulo();
         dto.pacienteId   = a.getPaciente() != null ? a.getPaciente().getId() : null;
         dto.pacienteNome = a.getPacienteNome();
         dto.usuarioId    = a.getUsuario() != null ? a.getUsuario().getId() : null;
@@ -56,8 +64,12 @@ public class AgendamentoDto {
         dto.valorRecebido   = a.getValorRecebido();
         dto.dataPagamento   = a.getDataPagamento();
         dto.metodoPagamento = a.getMetodoPagamento();
-        dto.createdAt    = a.getCreatedAt();
-        dto.updatedAt    = a.getUpdatedAt();
+        dto.createdAt         = a.getCreatedAt();
+        dto.updatedAt         = a.getUpdatedAt();
+        dto.wherebyMeetingId  = a.getWherebyMeetingId();
+        dto.wherebyHostUrl    = a.getWherebyHostUrl();
+        dto.wherebyViewerUrl  = a.getWherebyViewerUrl();
+        dto.atendimentoRemoto = a.getAtendimentoRemoto();
         return dto;
     }
 }

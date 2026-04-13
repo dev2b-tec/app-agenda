@@ -117,6 +117,18 @@ public class UsuarioService {
         if (dto.getDisponivel() != null) usuario.setDisponivel(dto.getDisponivel());
         if (dto.getTelefoneComercial() != null) usuario.setTelefoneComercial(dto.getTelefoneComercial());
         if (dto.getObservacoes() != null) usuario.setObservacoes(dto.getObservacoes());
+        if (dto.getDescricaoAtuacao()   != null) usuario.setDescricaoAtuacao(dto.getDescricaoAtuacao());
+        if (dto.getCursosCertificacoes()!= null) usuario.setCursosCertificacoes(dto.getCursosCertificacoes());
+        if (dto.getFaixaPreco()         != null) usuario.setFaixaPreco(dto.getFaixaPreco());
+        if (dto.getModoAtendimento()    != null) usuario.setModoAtendimento(dto.getModoAtendimento());
+        if (dto.getAceitaConvenio()     != null) usuario.setAceitaConvenio(dto.getAceitaConvenio());
+        if (dto.getInstagram()          != null) usuario.setInstagram(dto.getInstagram());
+        if (dto.getFacebook()           != null) usuario.setFacebook(dto.getFacebook());
+        if (dto.getLinkedin()           != null) usuario.setLinkedin(dto.getLinkedin());
+        if (dto.getYoutube()            != null) usuario.setYoutube(dto.getYoutube());
+        if (dto.getWebsiteLink()        != null) usuario.setWebsiteLink(dto.getWebsiteLink());
+        if (dto.getWhatsapp()           != null) usuario.setWhatsapp(dto.getWhatsapp());
+        if (dto.getPublicadoBuscador()  != null) usuario.setPublicadoBuscador(dto.getPublicadoBuscador());
 
         if (dto.getEmpresaId() != null) {
             Empresa empresa = empresaRepository.findById(dto.getEmpresaId())

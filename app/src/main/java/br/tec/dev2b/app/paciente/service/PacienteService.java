@@ -2,6 +2,8 @@ package br.tec.dev2b.app.paciente.service;
 
 import br.tec.dev2b.app.empresa.model.Empresa;
 import br.tec.dev2b.app.empresa.repository.EmpresaRepository;
+import br.tec.dev2b.app.financeiro.model.MovimentoFinanceiro;
+import br.tec.dev2b.app.financeiro.repository.MovimentoFinanceiroRepository;
 import br.tec.dev2b.app.paciente.dto.AtualizarPacienteDto;
 import br.tec.dev2b.app.paciente.dto.CriarPacienteDto;
 import br.tec.dev2b.app.paciente.dto.PacienteDto;
@@ -12,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +24,7 @@ public class PacienteService {
 
     private final PacienteRepository pacienteRepository;
     private final EmpresaRepository empresaRepository;
+    private final MovimentoFinanceiroRepository movimentoFinanceiroRepository;
 
     @Transactional
     public PacienteDto criar(CriarPacienteDto dto) {
@@ -57,9 +62,23 @@ public class PacienteService {
 
     @Transactional(readOnly = true)
     public List<PacienteDto> listarPorEmpresa(UUID empresaId) {
-        return pacienteRepository.findByEmpresaIdOrderByNomeAsc(empresaId).stream()
-                .map(PacienteDto::from)
-                .toList();
+        List<Paciente> pacientes = pacienteRepository.findByEmpresaIdOrderByNomeAsc(empresaId);
+        Map<UUID, List<MovimentoFinanceiro>> movsPorPaciente = movimentoFinanceiroRepository
+                .findByEmpresaIdOrderByDataVencimentoDesc(empresaId)
+                .stream()
+                .filter(m -> m.getPaciente() != null)
+                .collect(Collectors.groupingBy(m -> m.getPaciente().getId()));
+        return pacientes.stream().map(p -> {
+            PacienteDto dto = PacienteDto.from(p);
+            dto.setStatusPagamento(computarStatus(movsPorPaciente.getOrDefault(p.getId(), List.of())));
+            return dto;
+        }).toList();
+    }
+
+    private String computarStatus(List<MovimentoFinanceiro> movs) {
+        if (movs.isEmpty()) return null;
+        boolean todosQuitados = movs.stream().allMatch(m -> "PAGO".equalsIgnoreCase(m.getStatus()));
+        return todosQuitados ? "QUITADO" : "EM_ABERTO";
     }
 
     @Transactional(readOnly = true)
@@ -67,9 +86,17 @@ public class PacienteService {
         if (busca == null || busca.trim().isEmpty()) {
             return listarPorEmpresa(empresaId);
         }
-        return pacienteRepository.buscarPorEmpresaETexto(empresaId, busca).stream()
-                .map(PacienteDto::from)
-                .toList();
+        List<Paciente> pacientes = pacienteRepository.buscarPorEmpresaETexto(empresaId, busca);
+        Map<UUID, List<MovimentoFinanceiro>> movsPorPaciente = movimentoFinanceiroRepository
+                .findByEmpresaIdOrderByDataVencimentoDesc(empresaId)
+                .stream()
+                .filter(m -> m.getPaciente() != null)
+                .collect(Collectors.groupingBy(m -> m.getPaciente().getId()));
+        return pacientes.stream().map(p -> {
+            PacienteDto dto = PacienteDto.from(p);
+            dto.setStatusPagamento(computarStatus(movsPorPaciente.getOrDefault(p.getId(), List.of())));
+            return dto;
+        }).toList();
     }
 
     @Transactional(readOnly = true)

@@ -1,0 +1,2 @@
+ALTER TABLE agendamentos
+    ADD COLUMN IF NOT EXISTS atendimento_remoto BOOLEAN NOT NULL DEFAULT FALSE;

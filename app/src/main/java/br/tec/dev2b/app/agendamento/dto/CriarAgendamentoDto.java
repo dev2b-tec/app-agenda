@@ -11,6 +11,8 @@ import java.util.UUID;
 @Data
 public class CriarAgendamentoDto {
     private UUID empresaId;
+    private String tipo;
+    private String titulo;
     private UUID pacienteId;
     private String pacienteNome;
     private UUID usuarioId;
@@ -25,4 +27,5 @@ public class CriarAgendamentoDto {
     private BigDecimal valorRecebido;
     private LocalDate dataPagamento;
     private String metodoPagamento;
+    private Boolean atendimentoRemoto;
 }

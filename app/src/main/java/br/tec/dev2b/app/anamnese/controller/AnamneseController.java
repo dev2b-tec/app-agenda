@@ -44,4 +44,9 @@ public class AnamneseController {
         anamneseService.deletar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/empresa/{empresaId}/padrao")
+    public ResponseEntity<AnamneseDto> criarPadrao(@PathVariable UUID empresaId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(anamneseService.criarPadrao(empresaId));
+    }
 }

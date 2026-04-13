@@ -108,4 +108,46 @@ public class AnamneseService {
         }
         anamneseRepository.deleteById(id);
     }
+
+    @Transactional
+    public AnamneseDto criarPadrao(UUID empresaId) {
+        Empresa empresa = empresaRepository.findById(empresaId)
+                .orElseThrow(() -> new IllegalArgumentException("Empresa não encontrada: " + empresaId));
+
+        if (!anamneseRepository.findByEmpresaId(empresaId).isEmpty()) {
+            throw new IllegalStateException("Já existem anamneses cadastradas para esta empresa.");
+        }
+
+        Anamnese anamnese = Anamnese.builder()
+                .titulo("Anamnese Geral")
+                .empresa(empresa)
+                .build();
+
+        List<String[]> perguntas = List.of(
+                new String[]{"Qual o motivo da sua consulta hoje?", "CAMPO_ABERTO"},
+                new String[]{"Você possui alguma doença crônica diagnosticada? (ex: diabetes, hipertensão, etc.)", "CAMPO_ABERTO"},
+                new String[]{"Faz uso contínuo de algum medicamento?", "CAMPO_ABERTO"},
+                new String[]{"Possui alguma alergia conhecida? (medicamentos, alimentos, substâncias)", "CAMPO_ABERTO"},
+                new String[]{"Já realizou cirurgias anteriormente? Se sim, quais?", "CAMPO_ABERTO"},
+                new String[]{"Possui histórico familiar de doenças relevantes?", "CAMPO_ABERTO"},
+                new String[]{"Faz uso de bebidas alcoólicas?", "SIM_NAO"},
+                new String[]{"É fumante ou faz uso de tabaco?", "SIM_NAO"},
+                new String[]{"Pratica atividade física regularmente?", "SIM_NAO"},
+                new String[]{"Possui alguma queixa de dor? Se sim, descreva localização e intensidade.", "CAMPO_ABERTO"},
+                new String[]{"Como você classifica sua qualidade de sono?", "CAMPO_ABERTO"},
+                new String[]{"Possui alguma restrição alimentar ou segue dieta específica?", "CAMPO_ABERTO"},
+                new String[]{"Há algo mais que gostaria de informar ao profissional?", "CAMPO_ABERTO"}
+        );
+
+        for (int i = 0; i < perguntas.size(); i++) {
+            Pergunta p = Pergunta.builder()
+                    .texto(perguntas.get(i)[0])
+                    .tipoResposta(perguntas.get(i)[1])
+                    .ordem(i)
+                    .build();
+            anamnese.addPergunta(p);
+        }
+
+        return AnamneseDto.from(anamneseRepository.save(anamnese));
+    }
 }

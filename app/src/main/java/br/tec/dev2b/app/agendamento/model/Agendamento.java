@@ -53,6 +53,16 @@ public class Agendamento {
     private LocalDateTime fim;
 
     /**
+     * AGENDAMENTO | BLOQUEIO
+     */
+    @Column(nullable = false)
+    @Builder.Default
+    private String tipo = "AGENDAMENTO";
+
+    @Column
+    private String titulo;
+
+    /**
      * Aguardando | Confirmado | Atendido | Faltou | Cancelado
      */
     @Column(nullable = false)
@@ -91,6 +101,19 @@ public class Agendamento {
 
     @Column(name = "metodo_pagamento", length = 50)
     private String metodoPagamento;
+
+    @Column(name = "whereby_meeting_id", length = 255)
+    private String wherebyMeetingId;
+
+    @Column(name = "whereby_host_url", columnDefinition = "TEXT")
+    private String wherebyHostUrl;
+
+    @Column(name = "whereby_viewer_url", columnDefinition = "TEXT")
+    private String wherebyViewerUrl;
+
+    @Column(name = "atendimento_remoto", nullable = false)
+    @Builder.Default
+    private Boolean atendimentoRemoto = false;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

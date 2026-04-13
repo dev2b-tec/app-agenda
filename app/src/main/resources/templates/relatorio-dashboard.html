@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <title th:text="'Relatório Gerencial — ' + ${empresaNome}">Relatório Gerencial</title>
+  <style type="text/css">
+
+    @page {
+      size: A4;
+      margin: 20mm 16mm 26mm 16mm;
+      @bottom-center {
+        content: "DEV2B  \00B7  Documento Confidencial  \00B7  P\00E1gina " counter(page) " de " counter(pages);
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 7pt;
+        color: #95A5A6;
+      }
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 9.5pt;
+      color: #2C3E50;
+      background: #FFFFFF;
+      margin: 0;
+      padding: 0;
+    }
+
+    p { margin: 0; padding: 0; }
+
+    /* ─── Header band ─────────────────────────────────────── */
+    table.hdr-band {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #1A2E4A;
+      margin-bottom: 0;
+    }
+    .hdr-left  { padding: 14px 18px; vertical-align: middle; }
+    .hdr-right { padding: 14px 18px; text-align: right; vertical-align: middle; }
+    .hdr-logo  { max-height: 48px; max-width: 140px; }
+    .hdr-empresa { color: #FFFFFF; font-size: 13pt; font-weight: bold; margin-bottom: 2px; }
+    .hdr-title   { color: #FFFFFF; font-size: 15pt; font-weight: bold; margin-bottom: 3px; }
+    .hdr-sub     { color: #AED6F1; font-size: 8pt; }
+
+    /* ─── Meta strip ──────────────────────────────────────── */
+    table.meta-strip {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #EBF5FB;
+      border-bottom: 2px solid #2471A3;
+    }
+    .meta-strip td {
+      padding: 5px 18px;
+      font-size: 8pt;
+      color: #1A5276;
+    }
+    .meta-badge {
+      background-color: #2471A3;
+      color: #FFFFFF;
+      font-weight: bold;
+      padding: 1px 7px;
+      font-size: 7.5pt;
+    }
+
+    /* ─── Section header ──────────────────────────────────── */
+    .sec-hdr {
+      background-color: #EBF5FB;
+      border-left: 4px solid #2471A3;
+      padding: 5px 10px;
+      font-size: 8pt;
+      font-weight: bold;
+      color: #1A5276;
+      margin-top: 14px;
+      margin-bottom: 8px;
+    }
+
+    /* ─── Insight cards ───────────────────────────────────── */
+    table.insights-tbl { width: 100%; border-collapse: collapse; }
+    .insight-td { vertical-align: top; padding: 0 5px 6px 0; width: 50%; }
+    .insight-td.even { padding: 0 0 6px 5px; }
+
+    .insight-box { padding: 10px 12px; }
+    .i-positivo  { border-left: 4px solid #1E8449; background-color: #EAFAF1; }
+    .i-atencao   { border-left: 4px solid #B7770D; background-color: #FEFCEA; }
+    .i-alerta    { border-left: 4px solid #C0392B; background-color: #FDEDEC; }
+    .i-info      { border-left: 4px solid #2471A3; background-color: #EBF5FB; }
+
+    .insight-title-positivo { font-size: 9pt; font-weight: bold; color: #1A7A40; margin-bottom: 4px; }
+    .insight-title-atencao  { font-size: 9pt; font-weight: bold; color: #9A6A0A; margin-bottom: 4px; }
+    .insight-title-alerta   { font-size: 9pt; font-weight: bold; color: #922B21; margin-bottom: 4px; }
+    .insight-title-info     { font-size: 9pt; font-weight: bold; color: #1A5276; margin-bottom: 4px; }
+    .insight-text { font-size: 8.5pt; color: #2C3E50; line-height: 1.4; }
+
+    /* ─── Financial KPI boxes ────────────────────────────── */
+    table.fin-kpi-tbl  { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
+    .fin-kpi-td        { vertical-align: top; padding: 0 5px 0 0; width: 33%; }
+    .fin-kpi-td.last   { padding: 0 0 0 5px; }
+    .fin-kpi-td.mid    { padding: 0 5px; }
+    .fin-kpi-box-g  { border: 1px solid #D5D8DC; border-top: 4px solid #1E8449; padding: 10px 14px; }
+    .fin-kpi-box-r  { border: 1px solid #D5D8DC; border-top: 4px solid #C0392B; padding: 10px 14px; }
+    .fin-kpi-box-b  { border: 1px solid #D5D8DC; border-top: 4px solid #2471A3; padding: 10px 14px; }
+    .fin-lbl   { font-size: 7.5pt; font-weight: bold; color: #7F8C8D; margin-bottom: 5px; }
+    .fin-val-g { font-size: 15pt; font-weight: bold; color: #1E8449; margin-bottom: 5px; }
+    .fin-val-r { font-size: 15pt; font-weight: bold; color: #C0392B; margin-bottom: 5px; }
+    .fin-val-b { font-size: 15pt; font-weight: bold; color: #2471A3; margin-bottom: 5px; }
+    .fin-sub   { font-size: 7.5pt; color: #7F8C8D; }
+    .fin-sub strong { color: #2471A3; }
+
+    /* ─── DRE ────────────────────────────────────────────── */
+    table.dre-tbl { width: 100%; border-collapse: collapse; font-size: 9pt; margin-bottom: 14px; }
+    .dre-hdr td   { background-color: #1A2E4A; color: #FFFFFF; font-weight: bold; padding: 5px 10px; font-size: 8.5pt; }
+    .dre-sub td   { background-color: #EBF5FB; color: #1A5276; font-weight: bold; padding: 4px 10px; font-size: 8pt; }
+    .dre-row td   { padding: 4px 10px; border-bottom: 1px solid #EAECEE; }
+    .dre-tot td   { background-color: #F2F3F4; padding: 6px 10px; font-weight: bold; border-top: 2px solid #BDC3C7; }
+    .dre-lbl { color: #2C3E50; }
+    .dre-ind { color: #5D6D7E; padding-left: 22px; }
+    .dre-val { text-align: right; font-weight: bold; }
+    .dre-g   { color: #1E8449; }
+    .dre-r   { color: #C0392B; }
+
+    /* ─── Operational KPI boxes ──────────────────────────── */
+    table.ops-tbl { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+    .ops-td  { vertical-align: top; padding: 0 4px; }
+    .ops-td:first-child { padding-left: 0; }
+    .ops-td:last-child  { padding-right: 0; }
+    .ops-box { background-color: #F2F3F4; padding: 8px 10px; text-align: center; }
+    .ops-lbl { font-size: 7pt; font-weight: bold; color: #7F8C8D; margin-bottom: 3px; }
+    .ops-val-g { font-size: 17pt; font-weight: bold; color: #1E8449; }
+    .ops-val-o { font-size: 17pt; font-weight: bold; color: #CA6F1E; }
+    .ops-val-r { font-size: 17pt; font-weight: bold; color: #C0392B; }
+    .ops-val-b { font-size: 17pt; font-weight: bold; color: #2471A3; }
+    .ops-val-n { font-size: 17pt; font-weight: bold; color: #1A2E4A; }
+
+    /* ─── Rates strip ────────────────────────────────────── */
+    table.rates-tbl { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+    .rate-td { padding: 3px 0; font-size: 8pt; color: #7F8C8D; }
+    .rate-g  { color: #1E8449; font-weight: bold; }
+    .rate-o  { color: #CA6F1E; font-weight: bold; }
+    .rate-r  { color: #C0392B; font-weight: bold; }
+
+    /* ─── Agenda table ───────────────────────────────────── */
+    table.agenda-tbl { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+    .agenda-tbl thead tr  { background-color: #1A2E4A; color: #FFFFFF; }
+    .agenda-tbl thead th  { padding: 6px 8px; text-align: left; font-size: 8pt; font-weight: bold; }
+    .agenda-tbl tbody td  { padding: 5px 8px; border-bottom: 1px solid #EAECEE; }
+    .agenda-tbl .row-e    { background-color: #F7F9FB; }
+    .agenda-tbl .row-o    { background-color: #FFFFFF; }
+    .agenda-empty td      { text-align: center; color: #BDC3C7; font-style: italic; padding: 16px; }
+    .s-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      margin-right: 4px;
+    }
+
+    /* ─── Patient distribution ───────────────────────────── */
+    table.dist-outer { width: 100%; border-collapse: collapse; }
+    .dist-col { vertical-align: top; padding: 0 4px 0 0; width: 25%; }
+    .dist-col.last { padding-right: 0; padding-left: 4px; }
+    .dist-col.mid  { padding: 0 4px; }
+    .dist-card { border: 1px solid #D5D8DC; padding: 8px 10px; }
+    .dist-title { font-size: 7.5pt; font-weight: bold; color: #1A5276; border-bottom: 1px solid #D5D8DC; padding-bottom: 3px; margin-bottom: 6px; }
+    table.dist-row-tbl { width: 100%; border-collapse: collapse; margin-bottom: 1px; }
+    .dist-lbl { font-size: 7.5pt; color: #2C3E50; }
+    .dist-pct { font-size: 7.5pt; font-weight: bold; color: #2471A3; text-align: right; }
+    table.bar-tbl { width: 100%; border-collapse: collapse; height: 4px; margin-bottom: 4px; }
+    .bar-fill  { height: 4px; font-size: 1pt; background-color: #2471A3; }
+    .bar-empty { height: 4px; font-size: 1pt; background-color: #D5D8DC; }
+    .dist-empty { font-size: 7.5pt; color: #BDC3C7; font-style: italic; }
+
+    /* ─── Financial flow table ───────────────────────────── */
+    table.flow-tbl { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+    .flow-tbl thead tr   { background-color: #EBF5FB; }
+    .flow-tbl thead th   { padding: 5px 8px; font-size: 8pt; font-weight: bold; color: #1A5276; border-bottom: 1px solid #AED6F1; }
+    .flow-tbl tbody td   { padding: 4px 8px; border-bottom: 1px solid #EAECEE; }
+    .flow-tbl .flow-e    { background-color: #F7F9FB; }
+    .flow-g  { color: #1E8449; font-weight: bold; }
+    .flow-r  { color: #C0392B; }
+
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HEADER BAND ════════════════════════════════════ -->
+<table class="hdr-band" cellspacing="0" cellpadding="0">
+  <tr>
+    <td class="hdr-left" width="50%">
+      <div th:if="${logoUrl != null}">
+        <img class="hdr-logo" th:src="${logoUrl}" alt="Logo"/>
+        <p class="hdr-sub" style="margin-top:4px" th:text="${empresaNome}">Empresa</p>
+      </div>
+      <div th:unless="${logoUrl != null}">
+        <p class="hdr-empresa" th:text="${empresaNome}">Empresa</p>
+      </div>
+    </td>
+    <td class="hdr-right" width="50%">
+      <p class="hdr-title">RELATÓRIO GERENCIAL</p>
+      <p class="hdr-sub">Análise de Performance &amp; Indicadores Estratégicos</p>
+    </td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════ META STRIP ═════════════════════════════════════ -->
+<table class="meta-strip" cellspacing="0" cellpadding="0">
+  <tr>
+    <td width="34%">Período: <strong>Últimos 30 dias</strong></td>
+    <td width="33%" style="text-align:center">
+      <span th:if="${profissionalFiltro != null}">
+        <span class="meta-badge">PROFISSIONAL</span>&nbsp;<strong th:text="${profissionalFiltro}">—</strong>
+      </span>
+      <span th:unless="${profissionalFiltro != null}">Todos os profissionais</span>
+    </td>
+    <td width="33%" style="text-align:right" th:text="'Emitido em ' + ${dataGeracao}">—</td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════ RESUMO EXECUTIVO ═══════════════════════════════ -->
+<div class="sec-hdr">RESUMO EXECUTIVO</div>
+
+<table class="insights-tbl" cellspacing="0" cellpadding="0" th:if="${!insightPairs.isEmpty()}">
+  <tr th:each="pair : ${insightPairs}">
+    <th:block th:each="ins, iStat : ${pair}">
+      <td th:class="${iStat.even ? 'insight-td' : 'insight-td even'}">
+        <div th:class="'insight-box i-' + ${ins.tipo}">
+          <p th:class="'insight-title-' + ${ins.tipo}" th:text="${ins.titulo}">Título</p>
+          <p class="insight-text" th:text="${ins.texto}">Texto</p>
+        </div>
+      </td>
+    </th:block>
+    <td class="insight-td even" th:if="${pair.size() == 1}"></td>
+  </tr>
+</table>
+<p th:if="${insightPairs.isEmpty()}"
+   style="font-size:8.5pt;color:#95A5A6;font-style:italic;margin:6px 0">
+  Nenhuma análise disponível para o período selecionado.
+</p>
+
+<!-- ═══════════════════════ INDICADORES FINANCEIROS ═══════════════════════ -->
+<div class="sec-hdr">INDICADORES FINANCEIROS · ÚLTIMOS 30 DIAS</div>
+
+<table class="fin-kpi-tbl" cellspacing="0" cellpadding="0">
+  <tr>
+    <td class="fin-kpi-td">
+      <div class="fin-kpi-box-g">
+        <p class="fin-lbl">RECEITA RECEBIDA</p>
+        <p class="fin-val-g">R$&nbsp;<span th:text="${kpi.totalRecebido}">0</span></p>
+        <p class="fin-sub"><strong th:text="${kpi.taxaRecebimento}">—</strong> do potencial arrecadado</p>
+      </div>
+    </td>
+    <td class="fin-kpi-td mid">
+      <div class="fin-kpi-box-r">
+        <p class="fin-lbl">VALORES A RECEBER</p>
+        <p class="fin-val-r">R$&nbsp;<span th:text="${kpi.totalAReceber}">0</span></p>
+        <p class="fin-sub">Pendentes de recebimento</p>
+      </div>
+    </td>
+    <td class="fin-kpi-td last">
+      <div th:class="${kpi.saldoPositivo ? 'fin-kpi-box-b' : 'fin-kpi-box-r'}">
+        <p class="fin-lbl">SALDO DO PERÍODO</p>
+        <p th:class="${kpi.saldoPositivo ? 'fin-val-b' : 'fin-val-r'}">R$&nbsp;<span th:text="${kpi.saldo}">0</span></p>
+        <p class="fin-sub" th:text="${kpi.saldoPositivo ? 'Resultado favorável no período' : 'Resultado negativo no período'}">—</p>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<!-- DRE -->
+<table class="dre-tbl" cellspacing="0" cellpadding="0">
+  <tbody>
+    <tr class="dre-hdr"><td colspan="2">DEMONSTRATIVO DE RESULTADO DO EXERCÍCIO (DRE) — Simplificado</td></tr>
+    <tr class="dre-sub"><td colspan="2">Receitas do Período</td></tr>
+    <tr class="dre-row">
+      <td class="dre-ind">(+) Receitas efetivamente recebidas</td>
+      <td class="dre-val dre-g" th:text="'R$ ' + ${kpi.totalRecebido}">R$ 0,00</td>
+    </tr>
+    <tr class="dre-row">
+      <td class="dre-ind">(–) Valores pendentes / em aberto</td>
+      <td class="dre-val dre-r" th:text="'R$ ' + ${kpi.totalAReceber}">R$ 0,00</td>
+    </tr>
+    <tr class="dre-tot">
+      <td class="dre-lbl">(=) RESULTADO LÍQUIDO DO PERÍODO</td>
+      <td th:class="${kpi.saldoPositivo ? 'dre-val dre-g' : 'dre-val dre-r'}"
+          th:text="'R$ ' + ${kpi.saldo}">R$ 0,00</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════ INDICADORES OPERACIONAIS ══════════════════════ -->
+<div class="sec-hdr">INDICADORES OPERACIONAIS · ÚLTIMOS 30 DIAS</div>
+
+<table class="ops-tbl" cellspacing="0" cellpadding="0">
+  <tr>
+    <td class="ops-td">
+      <div class="ops-box">
+        <p class="ops-lbl">SESSÕES ATENDIDAS</p>
+        <p class="ops-val-g" th:text="${kpi.sessoesAtendidas}">0</p>
+      </div>
+    </td>
+    <td class="ops-td">
+      <div class="ops-box">
+        <p class="ops-lbl">DESMARCADAS</p>
+        <p class="ops-val-o" th:text="${kpi.sessoesDesmarcadas}">0</p>
+      </div>
+    </td>
+    <td class="ops-td">
+      <div class="ops-box">
+        <p class="ops-lbl">FALTAS</p>
+        <p class="ops-val-r" th:text="${kpi.faltas}">0</p>
+      </div>
+    </td>
+    <td class="ops-td">
+      <div class="ops-box">
+        <p class="ops-lbl">EVOLUÇÕES CRIADAS</p>
+        <p class="ops-val-b" th:text="${kpi.evolucoesCriadas}">0</p>
+      </div>
+    </td>
+    <td class="ops-td">
+      <div class="ops-box">
+        <p class="ops-lbl">BASE DE PACIENTES</p>
+        <p class="ops-val-n" th:text="${kpi.totalPacientes}">0</p>
+      </div>
+    </td>
+  </tr>
+</table>
+
+<table class="rates-tbl" cellspacing="0" cellpadding="0">
+  <tr>
+    <td class="rate-td">Taxa de presença:&nbsp;<span class="rate-g" th:text="${kpi.taxaPresenca}">—</span></td>
+    <td class="rate-td" style="text-align:center">Desmarcamentos:&nbsp;<span class="rate-o" th:text="${kpi.taxaDesmarcamento}">—</span></td>
+    <td class="rate-td" style="text-align:right">Taxa de faltas:&nbsp;<span class="rate-r" th:text="${kpi.taxaFalta}">—</span></td>
+  </tr>
+</table>
+
+<!-- ═══════════════════════ PAGE 2 ═════════════════════════════════════════ -->
+<div style="page-break-before: always">
+
+<!-- ═══════════════════════ AGENDA ═════════════════════════════════════════ -->
+<div class="sec-hdr">AGENDA — PRÓXIMAS SESSÕES</div>
+
+<table class="agenda-tbl" cellspacing="0" cellpadding="0">
+  <thead>
+    <tr>
+      <th width="7%">Hora</th>
+      <th width="28%">Paciente</th>
+      <th width="25%">Profissional</th>
+      <th width="10%">Duração</th>
+      <th width="30%">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr th:if="${agendamentos.isEmpty()}" class="agenda-empty">
+      <td colspan="5">Nenhum agendamento encontrado para o período selecionado.</td>
+    </tr>
+    <tr th:each="a, s : ${agendamentos}"
+        th:class="${s.even ? 'row-e' : 'row-o'}">
+      <td th:text="${a.hora}">—</td>
+      <td th:text="${a.paciente}">—</td>
+      <td th:text="${a.profissional}">—</td>
+      <td th:text="${a.duracao}">—</td>
+      <td>
+        <span class="s-dot" th:style="'background-color:' + ${a.statusCor}"></span>
+        <span th:text="${a.status}">—</span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- ═══════════════════════ PERFIL DE PACIENTES ════════════════════════════ -->
+<div class="sec-hdr">PERFIL DA BASE DE PACIENTES</div>
+
+<table class="dist-outer" cellspacing="0" cellpadding="0">
+  <tr>
+
+    <!-- Gênero -->
+    <td class="dist-col">
+      <div class="dist-card">
+        <p class="dist-title">GÊNCERO</p>
+        <div th:each="d : ${distGenero}">
+          <table class="dist-row-tbl" cellspacing="0" cellpadding="0">
+            <tr>
+              <td class="dist-lbl" th:text="${d.label}">—</td>
+              <td class="dist-pct" th:text="${d.pct}">0%</td>
+            </tr>
+          </table>
+          <table class="bar-tbl" cellspacing="0" cellpadding="0">
+            <tr>
+              <td class="bar-fill"
+                  th:style="'width:' + ${#strings.replace(d.pct,'%','')} + '%;background-color:#2471A3;height:4px;font-size:1pt'">&#160;</td>
+              <td class="bar-empty" style="background-color:#D5D8DC;height:4px;font-size:1pt">&#160;</td>
+            </tr>
+          </table>
+        </div>
+        <p class="dist-empty" th:if="${distGenero.isEmpty()}">Sem dados</p>
+      </div>
+    </td>
+
+    <!-- Grupo -->
+    <td class="dist-col mid">
+      <div class="dist-card">
+        <p class="dist-title">GRUPO</p>
+        <div th:each="d : ${distGrupo}">
+          <table class="dist-row-tbl" cellspacing="0" cellpadding="0">
+            <tr>
+              <td class="dist-lbl" th:text="${d.label}">—</td>
+              <td class="dist-pct" th:text="${d.pct}">0%</td>
+            </tr>
+          </table>
+          <table class="bar-tbl" cellspacing="0" cellpadding="0">
+            <tr>
+              <td th:style="'width:' + ${#strings.replace(d.pct,'%','')} + '%;background-color:#2471A3;height:4px;font-size:1pt'">&#160;</td>
+              <td style="background-color:#D5D8DC;height:4px;font-size:1pt">&#160;</td>
+            </tr>
+          </table>
+        </div>
+        <p class="dist-empty" th:if="${distGrupo.isEmpty()}">Sem dados</p>
+      </div>
+    </td>
+
+    <!-- Status -->
+    <td class="dist-col mid">
+      <div class="dist-card">
+        <p class="dist-title">STATUS</p>
+        <div th:each="d : ${distStatus}">
+          <table class="dist-row-tbl" cellspacing="0" cellpadding="0">
+            <tr>
+              <td class="dist-lbl" th:text="${d.label}">—</td>
+              <td class="dist-pct" th:text="${d.pct}">0%</td>
+            </tr>
+          </table>
+          <table class="bar-tbl" cellspacing="0" cellpadding="0">
+            <tr>
+              <td th:style="'width:' + ${#strings.replace(d.pct,'%','')} + '%;background-color:#2471A3;height:4px;font-size:1pt'">&#160;</td>
+              <td style="background-color:#D5D8DC;height:4px;font-size:1pt">&#160;</td>
+            </tr>
+          </table>
+        </div>
+        <p class="dist-empty" th:if="${distStatus.isEmpty()}">Sem dados</p>
+      </div>
+    </td>
+
+    <!-- Como conheceu -->
+    <td class="dist-col last">
+      <div class="dist-card">
+        <p class="dist-title">COMO CONHECEU</p>
+        <div th:each="d : ${distConheceu}">
+          <table class="dist-row-tbl" cellspacing="0" cellpadding="0">
+            <tr>
+              <td class="dist-lbl" th:text="${d.label}">—</td>
+              <td class="dist-pct" th:text="${d.pct}">0%</td>
+            </tr>
+          </table>
+          <table class="bar-tbl" cellspacing="0" cellpadding="0">
+            <tr>
+              <td th:style="'width:' + ${#strings.replace(d.pct,'%','')} + '%;background-color:#2471A3;height:4px;font-size:1pt'">&#160;</td>
+              <td style="background-color:#D5D8DC;height:4px;font-size:1pt">&#160;</td>
+            </tr>
+          </table>
+        </div>
+        <p class="dist-empty" th:if="${distConheceu.isEmpty()}">Sem dados</p>
+      </div>
+    </td>
+
+  </tr>
+</table>
+
+<!-- ═══════════════════════ FLUXO FINANCEIRO ═══════════════════════════════ -->
+<div th:if="${!chartFin.isEmpty()}">
+  <div class="sec-hdr">PROJEÇÃO DE FLUXO FINANCEIRO · PRÓXIMOS 30 DIAS</div>
+  <table class="flow-tbl" cellspacing="0" cellpadding="0">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Receita Realizada</th>
+        <th>A Receber</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="c, cs : ${chartFin}"
+          th:class="${cs.even ? 'flow-e' : ''}">
+        <td th:text="${c.data}">—</td>
+        <td class="flow-g" th:text="'R$ ' + ${c.recebidos}">—</td>
+        <td class="flow-r" th:text="'R$ ' + ${c.aReceber}">—</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</div><!-- fim page-break wrapper -->
+</body>
+</html>

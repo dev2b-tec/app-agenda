@@ -5,9 +5,13 @@ import br.tec.dev2b.app.financeiro.dto.CriarMovimentoDto;
 import br.tec.dev2b.app.financeiro.dto.MovimentoFinanceiroDto;
 import br.tec.dev2b.app.financeiro.service.MovimentoFinanceiroService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,5 +72,16 @@ public class MovimentoFinanceiroController {
     public ResponseEntity<Void> deletarFuturas(@PathVariable UUID id) {
         service.deletarParcelasFuturas(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/modelos/dre")
+    public ResponseEntity<byte[]> baixarModeloDre() throws IOException {
+        ClassPathResource resource = new ClassPathResource("static/dre_modelo.xlsx");
+        byte[] bytes = resource.getContentAsByteArray();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"dre_modelo.xlsx\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .contentLength(bytes.length)
+                .body(bytes);
     }
 }

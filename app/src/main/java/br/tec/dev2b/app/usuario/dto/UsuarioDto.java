@@ -43,6 +43,20 @@ public class UsuarioDto {
     private String telefoneComercial;
     private String observacoes;
 
+    // Buscador DEV2B
+    private String descricaoAtuacao;
+    private String cursosCertificacoes;
+    private String faixaPreco;
+    private String modoAtendimento;
+    private Boolean aceitaConvenio;
+    private String instagram;
+    private String facebook;
+    private String linkedin;
+    private String youtube;
+    private String websiteLink;
+    private String whatsapp;
+    private Boolean publicadoBuscador;
+
     public static UsuarioDto from(Usuario u) {
         UsuarioDto dto = new UsuarioDto();
         dto.id = u.getId();
@@ -74,6 +88,18 @@ public class UsuarioDto {
         dto.disponivel = u.getDisponivel();
         dto.telefoneComercial = u.getTelefoneComercial();
         dto.observacoes = u.getObservacoes();
+        dto.descricaoAtuacao = u.getDescricaoAtuacao();
+        dto.cursosCertificacoes = u.getCursosCertificacoes();
+        dto.faixaPreco = u.getFaixaPreco();
+        dto.modoAtendimento = u.getModoAtendimento();
+        dto.aceitaConvenio = u.getAceitaConvenio();
+        dto.instagram = u.getInstagram();
+        dto.facebook = u.getFacebook();
+        dto.linkedin = u.getLinkedin();
+        dto.youtube = u.getYoutube();
+        dto.websiteLink = u.getWebsiteLink();
+        dto.whatsapp = u.getWhatsapp();
+        dto.publicadoBuscador = u.getPublicadoBuscador();
         return dto;
     }
 }

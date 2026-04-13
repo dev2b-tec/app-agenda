@@ -1,0 +1,106 @@
+package br.tec.dev2b.app.financeiro.controller;
+
+import br.tec.dev2b.app.financeiro.dto.MovimentoFinanceiroDto;
+import br.tec.dev2b.app.financeiro.service.RelatorioContasPagarService;
+import br.tec.dev2b.app.financeiro.service.RelatorioContasReceberService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/v1/relatorios")
+@RequiredArgsConstructor
+public class RelatorioController {
+
+    private final RelatorioContasPagarService pagarService;
+    private final RelatorioContasReceberService receberService;
+
+    // â”€â”€ Contas a Pagar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    @GetMapping("/contas-a-pagar/pdf")
+    public ResponseEntity<byte[]> pdf(@RequestParam UUID empresaId) throws IOException {
+        List<MovimentoFinanceiroDto> dados = pagarService.listar(empresaId);
+        byte[] bytes = pagarService.gerarPdf(dados);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"contas_a_pagar.pdf\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .contentLength(bytes.length)
+                .body(bytes);
+    }
+
+    @GetMapping("/contas-a-pagar/excel")
+    public ResponseEntity<byte[]> excel(@RequestParam UUID empresaId) throws IOException {
+        List<MovimentoFinanceiroDto> dados = pagarService.listar(empresaId);
+        byte[] bytes = pagarService.gerarExcel(dados);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"contas_a_pagar.xlsx\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .contentLength(bytes.length)
+                .body(bytes);
+    }
+
+    @GetMapping("/contas-a-pagar/csv")
+    public ResponseEntity<byte[]> csv(@RequestParam UUID empresaId) throws IOException {
+        List<MovimentoFinanceiroDto> dados = pagarService.listar(empresaId);
+        byte[] bytes = pagarService.gerarCsv(dados).getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"contas_a_pagar.csv\"")
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .contentLength(bytes.length)
+                .body(bytes);
+    }
+
+    @GetMapping(value = "/contas-a-pagar/imprimir", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> imprimir(@RequestParam UUID empresaId) {
+        List<MovimentoFinanceiroDto> dados = pagarService.listar(empresaId);
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(pagarService.gerarHtml(dados));
+    }
+
+    // â”€â”€ Contas a Receber â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+    @GetMapping("/contas-a-receber/pdf")
+    public ResponseEntity<byte[]> pdfReceber(@RequestParam UUID empresaId) throws IOException {
+        byte[] bytes = receberService.gerarPdf(empresaId);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"contas_a_receber.pdf\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .contentLength(bytes.length)
+                .body(bytes);
+    }
+
+    @GetMapping("/contas-a-receber/excel")
+    public ResponseEntity<byte[]> excelReceber(@RequestParam UUID empresaId) throws IOException {
+        byte[] bytes = receberService.gerarExcel(empresaId);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"contas_a_receber.xlsx\"")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .contentLength(bytes.length)
+                .body(bytes);
+    }
+
+    @GetMapping("/contas-a-receber/csv")
+    public ResponseEntity<byte[]> csvReceber(@RequestParam UUID empresaId) throws IOException {
+        byte[] bytes = receberService.gerarCsv(empresaId).getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"contas_a_receber.csv\"")
+                .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+                .contentLength(bytes.length)
+                .body(bytes);
+    }
+
+    @GetMapping(value = "/contas-a-receber/imprimir", produces = MediaType.TEXT_HTML_VALUE)
+    public ResponseEntity<String> imprimirReceber(@RequestParam UUID empresaId) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(receberService.gerarHtml(empresaId));
+    }
+}
+}

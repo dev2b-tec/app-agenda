@@ -2,6 +2,9 @@ package br.tec.dev2b.app.empresa.service;
 
 import br.tec.dev2b.app.agenda.model.Agenda;
 import br.tec.dev2b.app.agenda.repository.AgendaRepository;
+import br.tec.dev2b.app.anamnese.model.Anamnese;
+import br.tec.dev2b.app.anamnese.model.Pergunta;
+import br.tec.dev2b.app.anamnese.repository.AnamneseRepository;
 import br.tec.dev2b.app.empresa.dto.AtualizarEmpresaDto;
 import br.tec.dev2b.app.empresa.dto.CriarEmpresaDto;
 import br.tec.dev2b.app.empresa.dto.EmpresaDto;
@@ -23,6 +26,19 @@ public class EmpresaService {
     private final EmpresaRepository empresaRepository;
     private final AgendaRepository agendaRepository;
     private final MinioService minioService;
+    private final AnamneseRepository anamneseRepository;
+
+    private static final List<String> PERGUNTAS_PADRAO = List.of(
+            "Possui contato de emergência?",
+            "Possui uma queixa inicial? Qual?",
+            "Sabe dizer o tempo com o sintoma da queixa? Quanto?",
+            "Pratica atividade física?",
+            "Tabagismo?",
+            "Alimentação saudável?",
+            "Ingere bebida alcoólica? Qual frequência?",
+            "Histórico familiar de doenças? Quais?",
+            "Faz uso contínuo de alguma medicação? Qual?"
+    );
 
     @Transactional
     public EmpresaDto criar(CriarEmpresaDto dto) {
@@ -38,7 +54,28 @@ public class EmpresaService {
                 .duracaoSessaoMinutos(dto.getDuracaoSessaoMinutos())
                 .build();
 
-        return EmpresaDto.from(empresaRepository.save(empresa));
+        Empresa salva = empresaRepository.save(empresa);
+        criarAnamnesePadrao(salva);
+        return EmpresaDto.from(salva);
+    }
+
+    private void criarAnamnesePadrao(Empresa empresa) {
+        Anamnese anamnese = Anamnese.builder()
+                .titulo("Anamnese Padrão")
+                .empresa(empresa)
+                .build();
+
+        for (int i = 0; i < PERGUNTAS_PADRAO.size(); i++) {
+            Pergunta pergunta = Pergunta.builder()
+                    .texto(PERGUNTAS_PADRAO.get(i))
+                    .tipoResposta("AMBOS")
+                    .ordem(i + 1)
+                    .ativa(true)
+                    .build();
+            anamnese.addPergunta(pergunta);
+        }
+
+        anamneseRepository.save(anamnese);
     }
 
     @Transactional(readOnly = true)

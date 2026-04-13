@@ -4,6 +4,7 @@ import br.tec.dev2b.app.agendamento.dto.AgendamentoDto;
 import br.tec.dev2b.app.agendamento.dto.AgendamentoServicoItemDto;
 import br.tec.dev2b.app.agendamento.dto.AtualizarAgendamentoDto;
 import br.tec.dev2b.app.agendamento.dto.CriarAgendamentoDto;
+import br.tec.dev2b.app.infra.whereby.WherebyService;
 import br.tec.dev2b.app.linhadotempo.service.LinhaDoTempoService;
 import br.tec.dev2b.app.agendamento.model.Agendamento;
 import br.tec.dev2b.app.agendamento.model.AgendamentoServico;
@@ -40,6 +41,7 @@ public class AgendamentoService {
     private final ServicoRepository     servicoRepository;
     private final LinhaDoTempoService   linhaDoTempoService;
     private final MovimentoFinanceiroRepository movimentoFinanceiroRepository;
+    private final WherebyService        wherebyService;
 
     @Transactional
     public AgendamentoDto criar(CriarAgendamentoDto dto) {
@@ -54,8 +56,9 @@ public class AgendamentoService {
                 ? usuarioRepository.findById(dto.getUsuarioId()).orElse(null)
                 : null;
 
-        // Conflict check
-        if (usuario != null) {
+        // Conflict check — skip for bloqueios
+        boolean isBloqueio = "BLOQUEIO".equalsIgnoreCase(dto.getTipo());
+        if (usuario != null && !isBloqueio) {
             List<Agendamento> conflitos = repository.findConflitos(usuario.getId(), dto.getInicio(), dto.getFim());
             if (!conflitos.isEmpty()) {
                 throw new IllegalStateException("Horário já reservado para este profissional");
@@ -64,6 +67,8 @@ public class AgendamentoService {
 
         Agendamento agendamento = Agendamento.builder()
                 .empresa(empresa)
+                .tipo(dto.getTipo() != null ? dto.getTipo().toUpperCase() : "AGENDAMENTO")
+                .titulo(dto.getTitulo())
                 .paciente(paciente)
                 .pacienteNome(paciente != null ? paciente.getNome() : dto.getPacienteNome())
                 .usuario(usuario)
@@ -75,6 +80,7 @@ public class AgendamentoService {
                 .observacoes(dto.getObservacoes())
                 .cor(dto.getCor() != null ? dto.getCor() : "purple")
                 .status("Aguardando")
+                .atendimentoRemoto(Boolean.TRUE.equals(dto.getAtendimentoRemoto()))
                 .valorTotal(dto.getValorTotal() != null ? dto.getValorTotal() : BigDecimal.ZERO)
                 .valorRecebido(dto.getValorRecebido() != null ? dto.getValorRecebido() : BigDecimal.ZERO)
                 .dataPagamento(dto.getDataPagamento())
@@ -109,8 +115,19 @@ public class AgendamentoService {
         }
 
         Agendamento saved = repository.save(agendamento);
+
+        // Cria sala Whereby para atendimentos remotos (não para bloqueios)
+        if (!isBloqueio && Boolean.TRUE.equals(saved.getAtendimentoRemoto())) {
+            WherebyService.SalaResult sala = wherebyService.criarSala(saved.getInicio(), saved.getFim());
+            if (sala != null) {
+                saved.setWherebyMeetingId(sala.meetingId());
+                saved.setWherebyHostUrl(sala.hostRoomUrl());
+                saved.setWherebyViewerUrl(sala.viewerRoomUrl());
+                saved = repository.save(saved);
+            }
+        }
+
         if (paciente != null) linhaDoTempoService.registrarAgendamento(saved);
-        sincronizarMovimento(saved);
         return AgendamentoDto.from(saved);
     }
 
@@ -194,11 +211,45 @@ public class AgendamentoService {
 
         if (dto.getInicio() != null)      agendamento.setInicio(dto.getInicio());
         if (dto.getFim() != null)         agendamento.setFim(dto.getFim());
+        if (dto.getTitulo() != null)      agendamento.setTitulo(dto.getTitulo());
         if (dto.getStatus() != null)      agendamento.setStatus(dto.getStatus());
+
+        // Encerra sala Whereby ao cancelar
+        if ("Cancelado".equals(dto.getStatus()) && agendamento.getWherebyMeetingId() != null) {
+            wherebyService.deletarSala(agendamento.getWherebyMeetingId());
+            agendamento.setWherebyMeetingId(null);
+            agendamento.setWherebyHostUrl(null);
+            agendamento.setWherebyViewerUrl(null);
+        }
+
         if (dto.getSala() != null)        agendamento.setSala(dto.getSala());
         if (dto.getRecorrente() != null)  agendamento.setRecorrente(dto.getRecorrente());
         if (dto.getObservacoes() != null) agendamento.setObservacoes(dto.getObservacoes());
         if (dto.getCor() != null)         agendamento.setCor(dto.getCor());
+
+        // Gerencia sala Whereby ao atualizar atendimentoRemoto
+        if (dto.getAtendimentoRemoto() != null) {
+            boolean eraRemoto  = Boolean.TRUE.equals(agendamento.getAtendimentoRemoto());
+            boolean seraRemoto = Boolean.TRUE.equals(dto.getAtendimentoRemoto());
+            agendamento.setAtendimentoRemoto(seraRemoto);
+            if (!eraRemoto && seraRemoto) {
+                // Ativando: cria sala
+                WherebyService.SalaResult sala = wherebyService.criarSala(
+                        dto.getInicio() != null ? dto.getInicio() : agendamento.getInicio(),
+                        dto.getFim()    != null ? dto.getFim()    : agendamento.getFim());
+                if (sala != null) {
+                    agendamento.setWherebyMeetingId(sala.meetingId());
+                    agendamento.setWherebyHostUrl(sala.hostRoomUrl());
+                    agendamento.setWherebyViewerUrl(sala.viewerRoomUrl());
+                }
+            } else if (eraRemoto && !seraRemoto) {
+                // Desativando: encerra sala
+                wherebyService.deletarSala(agendamento.getWherebyMeetingId());
+                agendamento.setWherebyMeetingId(null);
+                agendamento.setWherebyHostUrl(null);
+                agendamento.setWherebyViewerUrl(null);
+            }
+        }
 
         if (dto.getValorTotal() != null)      agendamento.setValorTotal(dto.getValorTotal());
         if (dto.getValorRecebido() != null)   agendamento.setValorRecebido(dto.getValorRecebido());
@@ -224,15 +275,31 @@ public class AgendamentoService {
 
         Agendamento saved = repository.save(agendamento);
         if (saved.getPaciente() != null) linhaDoTempoService.registrarAgendamento(saved);
-        sincronizarMovimento(saved);
+
+        // Gera movimento financeiro apenas ao marcar como Atendido;
+        // remove movimento ao marcar Faltou ou Cancelado.
+        if (dto.getStatus() != null) {
+            String st = dto.getStatus();
+            if ("Atendido".equalsIgnoreCase(st)) {
+                sincronizarMovimento(saved);
+            } else if ("Faltou".equalsIgnoreCase(st) || "Cancelado".equalsIgnoreCase(st)) {
+                movimentoFinanceiroRepository.findByReferenciaId(saved.getId())
+                        .ifPresent(m -> movimentoFinanceiroRepository.delete(m));
+            }
+        }
+
         return AgendamentoDto.from(saved);
     }
 
     @Transactional
     public void deletar(UUID id) {
-        if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("Agendamento não encontrado");
+        Agendamento agendamento = repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Agendamento não encontrado"));
+
+        if (agendamento.getWherebyMeetingId() != null) {
+            wherebyService.deletarSala(agendamento.getWherebyMeetingId());
         }
+
         linhaDoTempoService.removerPorReferencia(id);
         movimentoFinanceiroRepository.findByReferenciaId(id)
                 .ifPresent(m -> movimentoFinanceiroRepository.deleteById(m.getId()));

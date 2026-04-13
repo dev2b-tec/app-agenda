@@ -93,6 +93,44 @@ public class Usuario {
     @Column(columnDefinition = "TEXT")
     private String observacoes;
 
+    // ── Buscador DEV2B ────────────────────────────────────────────────────────
+    @Column(name = "descricao_atuacao", columnDefinition = "TEXT")
+    private String descricaoAtuacao;
+
+    @Column(name = "cursos_certificacoes", columnDefinition = "TEXT")
+    private String cursosCertificacoes;
+
+    @Column(name = "faixa_preco")
+    private String faixaPreco;
+
+    @Column(name = "modo_atendimento")
+    private String modoAtendimento;
+
+    @Column(name = "aceita_convenio")
+    private Boolean aceitaConvenio;
+
+    @Column
+    private String instagram;
+
+    @Column
+    private String facebook;
+
+    @Column
+    private String linkedin;
+
+    @Column
+    private String youtube;
+
+    @Column(name = "website_link")
+    private String websiteLink;
+
+    @Column
+    private String whatsapp;
+
+    @Builder.Default
+    @Column(name = "publicado_buscador", nullable = false)
+    private Boolean publicadoBuscador = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id")
     private Empresa empresa;

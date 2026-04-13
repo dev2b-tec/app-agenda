@@ -33,4 +33,18 @@ public class AtualizarUsuarioDto {
     private Boolean disponivel;
     private String telefoneComercial;
     private String observacoes;
+
+    // Buscador DEV2B
+    private String descricaoAtuacao;
+    private String cursosCertificacoes;
+    private String faixaPreco;
+    private String modoAtendimento;
+    private Boolean aceitaConvenio;
+    private String instagram;
+    private String facebook;
+    private String linkedin;
+    private String youtube;
+    private String websiteLink;
+    private String whatsapp;
+    private Boolean publicadoBuscador;
 }

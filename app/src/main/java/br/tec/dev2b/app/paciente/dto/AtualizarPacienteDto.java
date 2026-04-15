@@ -3,9 +3,11 @@ package br.tec.dev2b.app.paciente.dto;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 public class AtualizarPacienteDto {
+    private UUID usuarioId;
     private String nome;
     private LocalDate dataNascimento;
     private String telefone;

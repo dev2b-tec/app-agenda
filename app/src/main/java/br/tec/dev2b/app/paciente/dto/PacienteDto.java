@@ -34,6 +34,8 @@ public class PacienteDto {
     private String telefoneResponsavel;
     private String statusPagamento;
     private Integer sessoes;
+    private UUID usuarioId;
+    private String usuarioNome;
 
     public static PacienteDto from(Paciente p) {
         PacienteDto dto = new PacienteDto();
@@ -63,6 +65,10 @@ public class PacienteDto {
         dto.telefoneResponsavel = p.getTelefoneResponsavel();
         dto.statusPagamento = p.getStatusPagamento();
         dto.sessoes = p.getSessoes();
+        if (p.getUsuario() != null) {
+            dto.usuarioId = p.getUsuario().getId();
+            dto.usuarioNome = p.getUsuario().getNome();
+        }
         return dto;
     }
 }

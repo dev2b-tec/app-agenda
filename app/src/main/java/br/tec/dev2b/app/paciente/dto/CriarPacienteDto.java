@@ -8,6 +8,7 @@ import java.util.UUID;
 @Data
 public class CriarPacienteDto {
     private UUID empresaId;
+    private UUID usuarioId;
     private String nome;
     private LocalDate dataNascimento;
     private String telefone;

@@ -1,6 +1,7 @@
 package br.tec.dev2b.app.paciente.model;
 
 import br.tec.dev2b.app.empresa.model.Empresa;
+import br.tec.dev2b.app.usuario.model.Usuario;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +25,10 @@ public class Paciente {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id", nullable = false)
     private Empresa empresa;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
     @Column(nullable = false)
     private String nome;

@@ -9,6 +9,8 @@ import br.tec.dev2b.app.paciente.dto.CriarPacienteDto;
 import br.tec.dev2b.app.paciente.dto.PacienteDto;
 import br.tec.dev2b.app.paciente.model.Paciente;
 import br.tec.dev2b.app.paciente.repository.PacienteRepository;
+import br.tec.dev2b.app.usuario.model.Usuario;
+import br.tec.dev2b.app.usuario.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,14 +27,20 @@ public class PacienteService {
     private final PacienteRepository pacienteRepository;
     private final EmpresaRepository empresaRepository;
     private final MovimentoFinanceiroRepository movimentoFinanceiroRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Transactional
     public PacienteDto criar(CriarPacienteDto dto) {
         Empresa empresa = empresaRepository.findById(dto.getEmpresaId())
                 .orElseThrow(() -> new IllegalArgumentException("Empresa não encontrada: " + dto.getEmpresaId()));
 
+        Usuario usuario = dto.getUsuarioId() != null
+                ? usuarioRepository.findById(dto.getUsuarioId()).orElse(null)
+                : null;
+
         Paciente paciente = Paciente.builder()
                 .empresa(empresa)
+                .usuario(usuario)
                 .nome(dto.getNome())
                 .dataNascimento(dto.getDataNascimento())
                 .telefone(dto.getTelefone())
@@ -142,6 +150,9 @@ public class PacienteService {
         if (dto.getTelefoneResponsavel() != null) paciente.setTelefoneResponsavel(dto.getTelefoneResponsavel());
         if (dto.getStatusPagamento() != null) paciente.setStatusPagamento(dto.getStatusPagamento());
         if (dto.getSessoes() != null) paciente.setSessoes(dto.getSessoes());
+        if (dto.getUsuarioId() != null) {
+            usuarioRepository.findById(dto.getUsuarioId()).ifPresent(paciente::setUsuario);
+        }
 
         return PacienteDto.from(pacienteRepository.save(paciente));
     }

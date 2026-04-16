@@ -85,6 +85,11 @@ public class MovimentoFinanceiroService {
     }
 
     @Transactional(readOnly = true)
+    public List<UUID> listarPacientesInadimplentes(UUID empresaId) {
+        return repository.findPacientesInadimplentes(empresaId, LocalDate.now());
+    }
+
+    @Transactional(readOnly = true)
     public List<MovimentoFinanceiroDto> listarPorEmpresaETipo(UUID empresaId, String tipo) {
         return repository.findByEmpresaIdAndTipoOrderByDataVencimentoDesc(empresaId, tipo)
                 .stream().map(MovimentoFinanceiroDto::from).collect(Collectors.toList());

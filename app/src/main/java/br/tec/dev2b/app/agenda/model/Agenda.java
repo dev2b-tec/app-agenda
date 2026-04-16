@@ -116,6 +116,9 @@ public class Agenda {
     @Column(name = "ativar_horario_almoco")
     private Boolean ativarHorarioAlmoco;
 
+    @Column(name = "exibir_projecao")
+    private Boolean exibirProjecao;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

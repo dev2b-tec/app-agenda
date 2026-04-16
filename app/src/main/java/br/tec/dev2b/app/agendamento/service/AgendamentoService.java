@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -116,6 +117,12 @@ public class AgendamentoService {
 
         Agendamento saved = repository.save(agendamento);
 
+        // Associa grupo para recorrências
+        if (Boolean.TRUE.equals(dto.getRecorrente()) && dto.getRecorrenteAte() != null) {
+            saved.setGrupoRecorrenteId(saved.getId());
+            saved = repository.save(saved);
+        }
+
         // Cria sala Whereby para atendimentos remotos (não para bloqueios)
         if (!isBloqueio && Boolean.TRUE.equals(saved.getAtendimentoRemoto())) {
             WherebyService.SalaResult sala = wherebyService.criarSala(saved.getInicio(), saved.getFim());
@@ -128,6 +135,69 @@ public class AgendamentoService {
         }
 
         if (paciente != null) linhaDoTempoService.registrarAgendamento(saved);
+
+        // Gerar série recorrente
+        if (Boolean.TRUE.equals(dto.getRecorrente()) && dto.getRecorrenteAte() != null) {
+            long duracaoMinutos = java.time.Duration.between(dto.getInicio(), dto.getFim()).toMinutes();
+            String tipo = dto.getRecorrenciaTipo() != null ? dto.getRecorrenciaTipo().toUpperCase() : "SEMANAL";
+            LocalDate ate = dto.getRecorrenteAte();
+            UUID grupo = saved.getGrupoRecorrenteId();
+            int ocorrencia = 1;
+
+            while (true) {
+                LocalDateTime proxInicio;
+                if ("DIARIO".equals(tipo)) {
+                    proxInicio = dto.getInicio().plusDays(ocorrencia);
+                } else if ("MENSAL".equals(tipo)) {
+                    proxInicio = dto.getInicio().plusMonths(ocorrencia);
+                    // Se o mês não tem esse dia, LocalDateTime já avança pro último dia do mês (comportamento padrão Java)
+                } else { // SEMANAL (padrão)
+                    proxInicio = dto.getInicio().plusWeeks(ocorrencia);
+                }
+
+                if (proxInicio.toLocalDate().isAfter(ate)) break;
+
+                LocalDateTime proxFim = proxInicio.plusMinutes(duracaoMinutos);
+
+                // Para mensal: se houver conflito, tenta os próximos 7 dias
+                if ("MENSAL".equals(tipo) && usuario != null) {
+                    List<Agendamento> conflitos = repository.findConflitos(usuario.getId(), proxInicio, proxFim);
+                    int tentativa = 0;
+                    while (!conflitos.isEmpty() && tentativa < 7) {
+                        tentativa++;
+                        proxInicio = proxInicio.plusDays(tentativa);
+                        proxFim = proxInicio.plusMinutes(duracaoMinutos);
+                        if (proxInicio.toLocalDate().isAfter(ate)) break;
+                        conflitos = repository.findConflitos(usuario.getId(), proxInicio, proxFim);
+                    }
+                    if (proxInicio.toLocalDate().isAfter(ate)) { ocorrencia++; continue; }
+                }
+
+                Agendamento copia = Agendamento.builder()
+                        .empresa(empresa)
+                        .tipo(agendamento.getTipo())
+                        .titulo(agendamento.getTitulo())
+                        .paciente(paciente)
+                        .pacienteNome(agendamento.getPacienteNome())
+                        .usuario(usuario)
+                        .usuarioNome(agendamento.getUsuarioNome())
+                        .inicio(proxInicio)
+                        .fim(proxFim)
+                        .sala(agendamento.getSala())
+                        .recorrente(true)
+                        .grupoRecorrenteId(grupo)
+                        .observacoes(agendamento.getObservacoes())
+                        .cor(agendamento.getCor())
+                        .status("Aguardando")
+                        .atendimentoRemoto(agendamento.getAtendimentoRemoto())
+                        .valorTotal(agendamento.getValorTotal())
+                        .valorRecebido(BigDecimal.ZERO)
+                        .build();
+                repository.save(copia);
+                ocorrencia++;
+            }
+        }
+
         return AgendamentoDto.from(saved);
     }
 

@@ -94,6 +94,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
+        <!-- JavaMail para envio de e-mails via SMTP -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
         <!-- Flying Saucer: renderiza XHTML em PDF via OpenPDF -->
         <dependency>
             <groupId>org.xhtmlrenderer</groupId>

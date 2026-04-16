@@ -39,6 +39,9 @@ public class AgendamentoDto {
     private String wherebyHostUrl;
     private String wherebyViewerUrl;
     private Boolean atendimentoRemoto;
+    private String pacientePlano;
+    private Integer pacienteSessoes;
+    private java.time.LocalDate pacienteDataNascimento;
 
     public static AgendamentoDto from(Agendamento a) {
         AgendamentoDto dto = new AgendamentoDto();
@@ -70,6 +73,9 @@ public class AgendamentoDto {
         dto.wherebyHostUrl    = a.getWherebyHostUrl();
         dto.wherebyViewerUrl  = a.getWherebyViewerUrl();
         dto.atendimentoRemoto = a.getAtendimentoRemoto();
+        dto.pacientePlano     = a.getPaciente() != null ? a.getPaciente().getPlano() : null;
+        dto.pacienteSessoes   = a.getPaciente() != null ? a.getPaciente().getSessoes() : null;
+        dto.pacienteDataNascimento = a.getPaciente() != null ? a.getPaciente().getDataNascimento() : null;
         return dto;
     }
 }

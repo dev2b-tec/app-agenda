@@ -37,6 +37,11 @@ public class MovimentoFinanceiroController {
         return ResponseEntity.ok(service.listarPorEmpresa(empresaId));
     }
 
+    @GetMapping("/empresa/{empresaId}/inadimplentes")
+    public ResponseEntity<List<UUID>> listarInadimplentes(@PathVariable UUID empresaId) {
+        return ResponseEntity.ok(service.listarPacientesInadimplentes(empresaId));
+    }
+
     @GetMapping("/paciente/{pacienteId}")
     public ResponseEntity<List<MovimentoFinanceiroDto>> listarPorPaciente(@PathVariable UUID pacienteId) {
         return ResponseEntity.ok(service.listarPorPaciente(pacienteId));

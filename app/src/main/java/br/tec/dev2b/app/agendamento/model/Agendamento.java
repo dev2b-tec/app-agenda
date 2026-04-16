@@ -76,6 +76,9 @@ public class Agendamento {
     @Builder.Default
     private Boolean recorrente = false;
 
+    @Column(name = "grupo_recorrente_id")
+    private UUID grupoRecorrenteId;
+
     @Column(columnDefinition = "TEXT")
     private String observacoes;
 

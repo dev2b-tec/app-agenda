@@ -46,4 +46,5 @@ public class AtualizarAgendaDto {
     private LocalTime almocoInicio;
     private LocalTime almocoFim;
     private Boolean ativarHorarioAlmoco;
+    private Boolean exibirProjecao;
 }

@@ -99,6 +99,7 @@ public class AgendaService {
         if (dto.getAlmocoInicio() != null) agenda.setAlmocoInicio(dto.getAlmocoInicio());
         if (dto.getAlmocoFim() != null) agenda.setAlmocoFim(dto.getAlmocoFim());
         if (dto.getAtivarHorarioAlmoco() != null) agenda.setAtivarHorarioAlmoco(dto.getAtivarHorarioAlmoco());
+        if (dto.getExibirProjecao() != null) agenda.setExibirProjecao(dto.getExibirProjecao());
 
         return AgendaDto.from(agendaRepository.save(agenda));
     }

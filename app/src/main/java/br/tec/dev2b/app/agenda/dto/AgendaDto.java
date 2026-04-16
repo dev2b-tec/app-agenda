@@ -49,6 +49,7 @@ public class AgendaDto {
     private LocalTime almocoInicio;
     private LocalTime almocoFim;
     private Boolean ativarHorarioAlmoco;
+    private Boolean exibirProjecao;
 
     public static AgendaDto from(Agenda a) {
         AgendaDto dto = new AgendaDto();
@@ -93,6 +94,7 @@ public class AgendaDto {
         dto.almocoInicio = a.getAlmocoInicio();
         dto.almocoFim = a.getAlmocoFim();
         dto.ativarHorarioAlmoco = a.getAtivarHorarioAlmoco();
+        dto.exibirProjecao = a.getExibirProjecao();
         
         return dto;
     }

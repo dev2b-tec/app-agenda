@@ -28,4 +28,6 @@ public class CriarAgendamentoDto {
     private LocalDate dataPagamento;
     private String metodoPagamento;
     private Boolean atendimentoRemoto;
+    private LocalDate recorrenteAte;
+    private String recorrenciaTipo; // DIARIO, SEMANAL, MENSAL
 }

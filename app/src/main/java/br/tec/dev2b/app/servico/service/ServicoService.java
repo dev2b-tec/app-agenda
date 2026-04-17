@@ -29,7 +29,13 @@ public class ServicoService {
         Servico servico = Servico.builder()
                 .nome(dto.getNome())
                 .tipo(dto.getTipo() != null ? dto.getTipo() : "GERAL")
+                .categoria(dto.getCategoria())
+                .descricao(dto.getDescricao())
+                .tipoComissao(dto.getTipoComissao() != null ? dto.getTipoComissao() : "NAO_GERAR")
+                .duracaoMinutos(dto.getDuracaoMinutos())
                 .valor(dto.getValor())
+                .valorCusto(dto.getValorCusto())
+                .valorNaoComissionavel(dto.getValorNaoComissionavel())
                 .empresa(empresa)
                 .build();
 
@@ -71,7 +77,13 @@ public class ServicoService {
 
         if (dto.getNome() != null) servico.setNome(dto.getNome());
         if (dto.getTipo() != null) servico.setTipo(dto.getTipo());
+        if (dto.getCategoria() != null) servico.setCategoria(dto.getCategoria());
+        if (dto.getDescricao() != null) servico.setDescricao(dto.getDescricao());
+        if (dto.getTipoComissao() != null) servico.setTipoComissao(dto.getTipoComissao());
+        if (dto.getDuracaoMinutos() != null) servico.setDuracaoMinutos(dto.getDuracaoMinutos());
         if (dto.getValor() != null) servico.setValor(dto.getValor());
+        if (dto.getValorCusto() != null) servico.setValorCusto(dto.getValorCusto());
+        if (dto.getValorNaoComissionavel() != null) servico.setValorNaoComissionavel(dto.getValorNaoComissionavel());
         if (dto.getAtivo() != null) servico.setAtivo(dto.getAtivo());
 
         return ServicoDto.from(servicoRepository.save(servico));

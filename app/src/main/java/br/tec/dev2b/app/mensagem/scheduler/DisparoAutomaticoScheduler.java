@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 /**
  * Agendador do disparo automático de mensagens WhatsApp.
  *
- * <p>Executa diariamente às 08:00 (horário do servidor).
- * O horário pode ser ajustado via {@code disparo.cron} no application.properties.</p>
+ * <p>Executa a cada 1 hora, enviando apenas os agendamentos pendentes do período.
+ * O intervalo pode ser ajustado via {@code disparo.cron} no application.properties.</p>
  */
 @Slf4j
 @Component
@@ -20,10 +20,10 @@ public class DisparoAutomaticoScheduler {
     private final DisparoAutomaticoService disparoAutomaticoService;
 
     /**
-     * Job diário de confirmação de presença.
-     * Default: todo dia às 08:00. Override via disparo.confirmacao.cron.
+     * Job de confirmação de presença — executa a cada hora.
+     * Default: 0 0 * * * * (todo início de hora). Override via disparo.confirmacao.cron.
      */
-    @Scheduled(cron = "${disparo.confirmacao.cron:0 0 8 * * *}")
+    @Scheduled(cron = "${disparo.confirmacao.cron:0 0 * * * *}")
     public void executarConfirmacao() {
         log.info("[SCHEDULER] Executando job de confirmação automática...");
         int enviados = disparoAutomaticoService.executarDisparoConfirmacao();
@@ -31,10 +31,10 @@ public class DisparoAutomaticoScheduler {
     }
 
     /**
-     * Job diário de remarcação.
-     * Default: todo dia às 09:00. Override via disparo.remarcacao.cron.
+     * Job de remarcação — executa a cada hora.
+     * Default: 0 0 * * * * (todo início de hora). Override via disparo.remarcacao.cron.
      */
-    @Scheduled(cron = "${disparo.remarcacao.cron:0 0 9 * * *}")
+    @Scheduled(cron = "${disparo.remarcacao.cron:0 0 * * * *}")
     public void executarRemarcacao() {
         log.info("[SCHEDULER] Executando job de remarcação automática...");
         int enviados = disparoAutomaticoService.executarDisparoRemarcacao();

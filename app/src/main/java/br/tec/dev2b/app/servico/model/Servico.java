@@ -28,8 +28,27 @@ public class Servico {
     @Builder.Default
     private String tipo = "GERAL";
 
+    @Column(length = 255)
+    private String categoria;
+
+    @Column(columnDefinition = "TEXT")
+    private String descricao;
+
+    @Column(name = "tipo_comissao", length = 50)
+    @Builder.Default
+    private String tipoComissao = "NAO_GERAR";
+
+    @Column(name = "duracao_minutos")
+    private Integer duracaoMinutos;
+
     @Column(precision = 10, scale = 2)
     private BigDecimal valor;
+
+    @Column(name = "valor_custo", precision = 10, scale = 2)
+    private BigDecimal valorCusto;
+
+    @Column(name = "valor_nao_comissionavel", precision = 10, scale = 2)
+    private BigDecimal valorNaoComissionavel;
 
     @Column(nullable = false)
     @Builder.Default

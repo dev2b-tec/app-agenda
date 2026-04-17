@@ -1,11 +1,13 @@
 package br.tec.dev2b.app.usuario.dto;
 
+import br.tec.dev2b.app.perfil.model.PerfilPermissao;
 import br.tec.dev2b.app.usuario.model.Usuario;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -35,6 +37,7 @@ public class UsuarioDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String genero;
+    private String tipoAcesso;
     private Integer duracaoSessao;
     private String periodoMinimo;
     private String periodoMaximo;
@@ -56,6 +59,10 @@ public class UsuarioDto {
     private String websiteLink;
     private String whatsapp;
     private Boolean publicadoBuscador;
+
+    private Long perfilId;
+    private String perfilNome;
+    private List<String> permissoes;
 
     public static UsuarioDto from(Usuario u) {
         UsuarioDto dto = new UsuarioDto();
@@ -81,6 +88,7 @@ public class UsuarioDto {
         dto.createdAt = u.getCreatedAt();
         dto.updatedAt = u.getUpdatedAt();
         dto.genero = u.getGenero();
+        dto.tipoAcesso = u.getTipoAcesso();
         dto.duracaoSessao = u.getDuracaoSessao();
         dto.periodoMinimo = u.getPeriodoMinimo();
         dto.periodoMaximo = u.getPeriodoMaximo();
@@ -100,6 +108,14 @@ public class UsuarioDto {
         dto.websiteLink = u.getWebsiteLink();
         dto.whatsapp = u.getWhatsapp();
         dto.publicadoBuscador = u.getPublicadoBuscador();
+        if (u.getPerfil() != null) {
+            dto.perfilId   = u.getPerfil().getId();
+            dto.perfilNome = u.getPerfil().getNome();
+            dto.permissoes = u.getPerfil().getPermissoes().stream()
+                    .map(PerfilPermissao::getPermissao).toList();
+        } else {
+            dto.permissoes = List.of();
+        }
         return dto;
     }
 }

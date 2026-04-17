@@ -101,6 +101,9 @@ public class Paciente {
     @Builder.Default
     private Integer sessoes = 0;
 
+    @Column(name = "foto_url", columnDefinition = "TEXT")
+    private String fotoUrl;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

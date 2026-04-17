@@ -6,8 +6,10 @@ import br.tec.dev2b.app.paciente.dto.PacienteDto;
 import br.tec.dev2b.app.paciente.service.PacienteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -57,5 +59,12 @@ public class PacienteController {
     public ResponseEntity<Void> deletar(@PathVariable UUID id) {
         pacienteService.deletar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/{id}/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<PacienteDto> uploadFoto(
+            @PathVariable UUID id,
+            @RequestParam("arquivo") MultipartFile arquivo) {
+        return ResponseEntity.ok(pacienteService.uploadFoto(id, arquivo));
     }
 }

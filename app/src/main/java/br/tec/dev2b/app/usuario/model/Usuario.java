@@ -1,6 +1,7 @@
 package br.tec.dev2b.app.usuario.model;
 
 import br.tec.dev2b.app.empresa.model.Empresa;
+import br.tec.dev2b.app.perfil.model.Perfil;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -71,6 +72,9 @@ public class Usuario {
     @Column
     private String genero;
 
+    @Column(name = "tipo_acesso")
+    private String tipoAcesso;
+
     @Column(name = "duracao_sessao")
     private Integer duracaoSessao;
 
@@ -130,6 +134,10 @@ public class Usuario {
     @Builder.Default
     @Column(name = "publicado_buscador", nullable = false)
     private Boolean publicadoBuscador = false;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "perfil_id")
+    private Perfil perfil;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id")

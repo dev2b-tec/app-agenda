@@ -4,6 +4,7 @@ import br.tec.dev2b.app.empresa.model.Empresa;
 import br.tec.dev2b.app.empresa.repository.EmpresaRepository;
 import br.tec.dev2b.app.financeiro.model.MovimentoFinanceiro;
 import br.tec.dev2b.app.financeiro.repository.MovimentoFinanceiroRepository;
+import br.tec.dev2b.app.infra.minio.MinioService;
 import br.tec.dev2b.app.paciente.dto.AtualizarPacienteDto;
 import br.tec.dev2b.app.paciente.dto.CriarPacienteDto;
 import br.tec.dev2b.app.paciente.dto.PacienteDto;
@@ -14,6 +15,7 @@ import br.tec.dev2b.app.usuario.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,7 @@ public class PacienteService {
     private final EmpresaRepository empresaRepository;
     private final MovimentoFinanceiroRepository movimentoFinanceiroRepository;
     private final UsuarioRepository usuarioRepository;
+    private final MinioService minioService;
 
     @Transactional
     public PacienteDto criar(CriarPacienteDto dto) {
@@ -163,5 +166,24 @@ public class PacienteService {
             throw new IllegalArgumentException("Paciente não encontrado: " + id);
         }
         pacienteRepository.deleteById(id);
+    }
+
+    @Transactional
+    public PacienteDto uploadFoto(UUID id, MultipartFile arquivo) {
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Paciente não encontrado: " + id));
+
+        String extensao = obterExtensao(arquivo.getOriginalFilename());
+        String objectName = "pacientes/" + id + "/foto" + extensao;
+        minioService.upload(minioService.getBucketFotos(), objectName, arquivo);
+        String url = minioService.getPublicUrl(minioService.getBucketFotos(), objectName);
+
+        paciente.setFotoUrl(url);
+        return PacienteDto.from(pacienteRepository.save(paciente));
+    }
+
+    private String obterExtensao(String nomeArquivo) {
+        if (nomeArquivo == null || !nomeArquivo.contains(".")) return ".jpg";
+        return nomeArquivo.substring(nomeArquivo.lastIndexOf('.'));
     }
 }

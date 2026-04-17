@@ -26,6 +26,7 @@ public class AtualizarUsuarioDto {
     private UUID empresaId;
     private UUID agendaId;
     private String genero;
+    private String tipoAcesso;
     private Integer duracaoSessao;
     private String periodoMinimo;
     private String periodoMaximo;
@@ -47,4 +48,6 @@ public class AtualizarUsuarioDto {
     private String websiteLink;
     private String whatsapp;
     private Boolean publicadoBuscador;
+
+    private Long perfilId;
 }

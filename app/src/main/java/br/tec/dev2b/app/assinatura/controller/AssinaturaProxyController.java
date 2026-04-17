@@ -43,4 +43,11 @@ public class AssinaturaProxyController {
     public ResponseEntity<Map<String, Object>> cancelar(@PathVariable String id) {
         return ResponseEntity.ok(integrationService.cancelarAssinatura(id));
     }
+
+    @PostMapping("/{id}/upgrade")
+    public ResponseEntity<Map<String, Object>> upgrade(
+            @PathVariable String id,
+            @RequestBody Map<String, Object> dto) {
+        return ResponseEntity.ok(integrationService.upgradeAssinatura(id, dto));
+    }
 }

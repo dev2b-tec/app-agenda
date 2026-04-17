@@ -26,4 +26,7 @@ public class CriarUsuarioDto {
     private String numeroConselho;
     private String especialidade;
     private UUID empresaId;
+    private String genero;
+    private String tipoAcesso;
+    private Long perfilId;
 }

@@ -1,0 +1,1 @@
+ALTER TABLE pacientes ADD COLUMN IF NOT EXISTS foto_url TEXT;

@@ -3,6 +3,8 @@ package br.tec.dev2b.app.usuario.service;
 import br.tec.dev2b.app.empresa.model.Empresa;
 import br.tec.dev2b.app.empresa.repository.EmpresaRepository;
 import br.tec.dev2b.app.infra.minio.MinioService;
+import br.tec.dev2b.app.perfil.model.Perfil;
+import br.tec.dev2b.app.perfil.repository.PerfilRepository;
 import br.tec.dev2b.app.usuario.dto.AtualizarUsuarioDto;
 import br.tec.dev2b.app.usuario.dto.CriarUsuarioDto;
 import br.tec.dev2b.app.usuario.dto.SyncUsuarioDto;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Slf4j
@@ -27,6 +30,15 @@ public class UsuarioService {
     private final EmpresaRepository empresaRepository;
     private final MinioService minioService;
     private final br.tec.dev2b.app.agenda.repository.AgendaRepository agendaRepository;
+    private final PerfilRepository perfilRepository;
+
+    private static final Map<String, String> TIPO_ACESSO_TO_PERFIL = Map.of(
+            "Profissional / ADM",   "PROFISSIONAL_ADM",
+            "Assistente",           "ASSISTENTE",
+            "Profissional Simples",  "PROFISSIONAL_SIMPLES",
+            "Gerente",              "GERENTE",
+            "Gerente Geral",        "GERENTE_GERAL"
+    );
 
     @Transactional
     public UsuarioDto criar(CriarUsuarioDto dto) {
@@ -55,8 +67,12 @@ public class UsuarioService {
                 .conselho(dto.getConselho())
                 .numeroConselho(dto.getNumeroConselho())
                 .especialidade(dto.getEspecialidade())
+                .genero(dto.getGenero())
+                .tipoAcesso(dto.getTipoAcesso())
                 .empresa(empresa)
                 .build();
+
+        resolverPerfil(usuario, dto.getPerfilId(), dto.getTipoAcesso());
 
         return UsuarioDto.from(usuarioRepository.save(usuario));
     }
@@ -110,7 +126,9 @@ public class UsuarioService {
         if (dto.getNumeroConselho() != null) usuario.setNumeroConselho(dto.getNumeroConselho());
         if (dto.getEspecialidade() != null) usuario.setEspecialidade(dto.getEspecialidade());
         if (dto.getGenero() != null) usuario.setGenero(dto.getGenero());
+        if (dto.getTipoAcesso() != null) usuario.setTipoAcesso(dto.getTipoAcesso());
         if (dto.getDuracaoSessao() != null) usuario.setDuracaoSessao(dto.getDuracaoSessao());
+        resolverPerfil(usuario, dto.getPerfilId(), dto.getTipoAcesso());
         if (dto.getPeriodoMinimo() != null) usuario.setPeriodoMinimo(dto.getPeriodoMinimo());
         if (dto.getPeriodoMaximo() != null) usuario.setPeriodoMaximo(dto.getPeriodoMaximo());
         if (dto.getTempoAntecedencia() != null) usuario.setTempoAntecedencia(dto.getTempoAntecedencia());
@@ -244,6 +262,19 @@ public class UsuarioService {
     private String obterExtensao(String filename) {
         if (filename == null || !filename.contains(".")) return ".jpg";
         return filename.substring(filename.lastIndexOf("."));
+    }
+
+    private void resolverPerfil(Usuario usuario, Long perfilId, String tipoAcesso) {
+        if (perfilId != null) {
+            Perfil perfil = perfilRepository.findById(perfilId)
+                    .orElseThrow(() -> new IllegalArgumentException("Perfil não encontrado: " + perfilId));
+            usuario.setPerfil(perfil);
+        } else if (tipoAcesso != null) {
+            String perfilNome = TIPO_ACESSO_TO_PERFIL.get(tipoAcesso);
+            if (perfilNome != null) {
+                perfilRepository.findByNome(perfilNome).ifPresent(usuario::setPerfil);
+            }
+        }
     }
 
     @Transactional

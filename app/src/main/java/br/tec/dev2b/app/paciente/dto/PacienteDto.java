@@ -34,6 +34,7 @@ public class PacienteDto {
     private String telefoneResponsavel;
     private String statusPagamento;
     private Integer sessoes;
+    private String fotoUrl;
     private UUID usuarioId;
     private String usuarioNome;
 
@@ -65,6 +66,7 @@ public class PacienteDto {
         dto.telefoneResponsavel = p.getTelefoneResponsavel();
         dto.statusPagamento = p.getStatusPagamento();
         dto.sessoes = p.getSessoes();
+        dto.fotoUrl = p.getFotoUrl();
         if (p.getUsuario() != null) {
             dto.usuarioId = p.getUsuario().getId();
             dto.usuarioNome = p.getUsuario().getNome();

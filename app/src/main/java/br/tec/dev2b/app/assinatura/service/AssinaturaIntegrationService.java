@@ -93,6 +93,20 @@ public class AssinaturaIntegrationService {
         }
     }
 
+    public Map<String, Object> upgradeAssinatura(String assinaturaId, Map<String, Object> dto) {
+        try {
+            String url = pagamentoServiceUrl + "/api/v1/assinaturas/" + assinaturaId + "/upgrade";
+            ResponseEntity<Map<String, Object>> resp = restTemplate.exchange(
+                    url, HttpMethod.POST, new HttpEntity<>(dto),
+                    new ParameterizedTypeReference<>() {}
+            );
+            return resp.getBody();
+        } catch (Exception e) {
+            log.error("Erro ao fazer upgrade da assinatura {}: {}", assinaturaId, e.getMessage(), e);
+            throw new RuntimeException("Erro ao fazer upgrade: " + e.getMessage(), e);
+        }
+    }
+
     public Map<String, Object> buscarConfigMp() {
         try {
             String url = pagamentoServiceUrl + "/api/v1/config/mp";

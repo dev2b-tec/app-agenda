@@ -6,9 +6,13 @@ import br.tec.dev2b.app.financeiro.model.MovimentoFinanceiro;
 import br.tec.dev2b.app.financeiro.repository.MovimentoFinanceiroRepository;
 import br.tec.dev2b.app.infra.minio.MinioService;
 import br.tec.dev2b.app.paciente.dto.AtualizarPacienteDto;
+import br.tec.dev2b.app.paciente.dto.ConcederAcessoDto;
 import br.tec.dev2b.app.paciente.dto.CriarPacienteDto;
+import br.tec.dev2b.app.paciente.dto.PacienteAcessoDto;
 import br.tec.dev2b.app.paciente.dto.PacienteDto;
 import br.tec.dev2b.app.paciente.model.Paciente;
+import br.tec.dev2b.app.paciente.model.PacienteAcesso;
+import br.tec.dev2b.app.paciente.repository.PacienteAcessoRepository;
 import br.tec.dev2b.app.paciente.repository.PacienteRepository;
 import br.tec.dev2b.app.usuario.model.Usuario;
 import br.tec.dev2b.app.usuario.repository.UsuarioRepository;
@@ -27,6 +31,7 @@ import java.util.stream.Collectors;
 public class PacienteService {
 
     private final PacienteRepository pacienteRepository;
+    private final PacienteAcessoRepository pacienteAcessoRepository;
     private final EmpresaRepository empresaRepository;
     private final MovimentoFinanceiroRepository movimentoFinanceiroRepository;
     private final UsuarioRepository usuarioRepository;
@@ -37,13 +42,8 @@ public class PacienteService {
         Empresa empresa = empresaRepository.findById(dto.getEmpresaId())
                 .orElseThrow(() -> new IllegalArgumentException("Empresa não encontrada: " + dto.getEmpresaId()));
 
-        Usuario usuario = dto.getUsuarioId() != null
-                ? usuarioRepository.findById(dto.getUsuarioId()).orElse(null)
-                : null;
-
         Paciente paciente = Paciente.builder()
                 .empresa(empresa)
-                .usuario(usuario)
                 .nome(dto.getNome())
                 .dataNascimento(dto.getDataNascimento())
                 .telefone(dto.getTelefone())
@@ -68,12 +68,26 @@ public class PacienteService {
                 .telefoneResponsavel(dto.getTelefoneResponsavel())
                 .build();
 
-        return PacienteDto.from(pacienteRepository.save(paciente));
+        Paciente salvo = pacienteRepository.save(paciente);
+
+        // Vincula automaticamente o usuário criador via paciente_acessos
+        if (dto.getUsuarioId() != null) {
+            usuarioRepository.findById(dto.getUsuarioId()).ifPresent(u ->
+                pacienteAcessoRepository.save(PacienteAcesso.builder()
+                        .paciente(salvo)
+                        .usuario(u)
+                        .build())
+            );
+        }
+
+        return PacienteDto.from(salvo);
     }
 
     @Transactional(readOnly = true)
-    public List<PacienteDto> listarPorEmpresa(UUID empresaId) {
-        List<Paciente> pacientes = pacienteRepository.findByEmpresaIdOrderByNomeAsc(empresaId);
+    public List<PacienteDto> listarPorEmpresa(UUID empresaId, UUID usuarioId) {
+        List<Paciente> pacientes = usuarioId != null
+                ? pacienteRepository.findByEmpresaIdAndUsuarioIdOrderByNomeAsc(empresaId, usuarioId)
+                : pacienteRepository.findByEmpresaIdOrderByNomeAsc(empresaId);
         Map<UUID, List<MovimentoFinanceiro>> movsPorPaciente = movimentoFinanceiroRepository
                 .findByEmpresaIdOrderByDataVencimentoDesc(empresaId)
                 .stream()
@@ -93,11 +107,13 @@ public class PacienteService {
     }
 
     @Transactional(readOnly = true)
-    public List<PacienteDto> buscar(UUID empresaId, String busca) {
+    public List<PacienteDto> buscar(UUID empresaId, String busca, UUID usuarioId) {
         if (busca == null || busca.trim().isEmpty()) {
-            return listarPorEmpresa(empresaId);
+            return listarPorEmpresa(empresaId, usuarioId);
         }
-        List<Paciente> pacientes = pacienteRepository.buscarPorEmpresaETexto(empresaId, busca);
+        List<Paciente> pacientes = usuarioId != null
+                ? pacienteRepository.buscarPorEmpresaUsuarioETexto(empresaId, usuarioId, busca)
+                : pacienteRepository.buscarPorEmpresaETexto(empresaId, busca);
         Map<UUID, List<MovimentoFinanceiro>> movsPorPaciente = movimentoFinanceiroRepository
                 .findByEmpresaIdOrderByDataVencimentoDesc(empresaId)
                 .stream()
@@ -153,9 +169,6 @@ public class PacienteService {
         if (dto.getTelefoneResponsavel() != null) paciente.setTelefoneResponsavel(dto.getTelefoneResponsavel());
         if (dto.getStatusPagamento() != null) paciente.setStatusPagamento(dto.getStatusPagamento());
         if (dto.getSessoes() != null) paciente.setSessoes(dto.getSessoes());
-        if (dto.getUsuarioId() != null) {
-            usuarioRepository.findById(dto.getUsuarioId()).ifPresent(paciente::setUsuario);
-        }
 
         return PacienteDto.from(pacienteRepository.save(paciente));
     }
@@ -166,6 +179,38 @@ public class PacienteService {
             throw new IllegalArgumentException("Paciente não encontrado: " + id);
         }
         pacienteRepository.deleteById(id);
+    }
+
+    // ── Acesso compartilhado ────────────────────────────────────────────────
+
+    @Transactional(readOnly = true)
+    public List<PacienteAcessoDto> listarAcessos(UUID pacienteId) {
+        return pacienteAcessoRepository.findByPacienteId(pacienteId).stream()
+                .map(a -> {
+                    PacienteAcessoDto dto = new PacienteAcessoDto();
+                    dto.setUsuarioId(a.getUsuario().getId());
+                    dto.setUsuarioNome(a.getUsuario().getNome());
+                    return dto;
+                }).toList();
+    }
+
+    @Transactional
+    public void concederAcesso(UUID pacienteId, ConcederAcessoDto dto) {
+        Paciente paciente = pacienteRepository.findById(pacienteId)
+                .orElseThrow(() -> new IllegalArgumentException("Paciente não encontrado: " + pacienteId));
+        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado: " + dto.getUsuarioId()));
+        if (!pacienteAcessoRepository.existsByPacienteIdAndUsuarioId(pacienteId, usuario.getId())) {
+            pacienteAcessoRepository.save(PacienteAcesso.builder()
+                    .paciente(paciente)
+                    .usuario(usuario)
+                    .build());
+        }
+    }
+
+    @Transactional
+    public void revogarAcesso(UUID pacienteId, UUID usuarioId) {
+        pacienteAcessoRepository.deleteByPacienteIdAndUsuarioId(pacienteId, usuarioId);
     }
 
     @Transactional

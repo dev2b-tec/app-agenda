@@ -1,7 +1,9 @@
 package br.tec.dev2b.app.paciente.controller;
 
 import br.tec.dev2b.app.paciente.dto.AtualizarPacienteDto;
+import br.tec.dev2b.app.paciente.dto.ConcederAcessoDto;
 import br.tec.dev2b.app.paciente.dto.CriarPacienteDto;
+import br.tec.dev2b.app.paciente.dto.PacienteAcessoDto;
 import br.tec.dev2b.app.paciente.dto.PacienteDto;
 import br.tec.dev2b.app.paciente.service.PacienteService;
 import lombok.RequiredArgsConstructor;
@@ -27,15 +29,18 @@ public class PacienteController {
     }
 
     @GetMapping("/empresa/{empresaId}")
-    public ResponseEntity<List<PacienteDto>> listarPorEmpresa(@PathVariable UUID empresaId) {
-        return ResponseEntity.ok(pacienteService.listarPorEmpresa(empresaId));
+    public ResponseEntity<List<PacienteDto>> listarPorEmpresa(
+            @PathVariable UUID empresaId,
+            @RequestParam(required = false) UUID usuarioId) {
+        return ResponseEntity.ok(pacienteService.listarPorEmpresa(empresaId, usuarioId));
     }
 
     @GetMapping("/empresa/{empresaId}/buscar")
     public ResponseEntity<List<PacienteDto>> buscar(
             @PathVariable UUID empresaId,
-            @RequestParam(required = false) String q) {
-        return ResponseEntity.ok(pacienteService.buscar(empresaId, q));
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) UUID usuarioId) {
+        return ResponseEntity.ok(pacienteService.buscar(empresaId, q, usuarioId));
     }
 
     @GetMapping("/empresa/{empresaId}/status/{status}")
@@ -66,5 +71,24 @@ public class PacienteController {
             @PathVariable UUID id,
             @RequestParam("arquivo") MultipartFile arquivo) {
         return ResponseEntity.ok(pacienteService.uploadFoto(id, arquivo));
+    }
+
+    // ── Acesso compartilhado ────────────────────────────────────────────────
+
+    @GetMapping("/{id}/acessos")
+    public ResponseEntity<List<PacienteAcessoDto>> listarAcessos(@PathVariable UUID id) {
+        return ResponseEntity.ok(pacienteService.listarAcessos(id));
+    }
+
+    @PostMapping("/{id}/acessos")
+    public ResponseEntity<Void> concederAcesso(@PathVariable UUID id, @RequestBody ConcederAcessoDto dto) {
+        pacienteService.concederAcesso(id, dto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/{id}/acessos/{usuarioId}")
+    public ResponseEntity<Void> revogarAcesso(@PathVariable UUID id, @PathVariable UUID usuarioId) {
+        pacienteService.revogarAcesso(id, usuarioId);
+        return ResponseEntity.noContent().build();
     }
 }

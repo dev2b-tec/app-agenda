@@ -14,21 +14,39 @@ import java.util.UUID;
 @Repository
 public interface PacienteRepository extends JpaRepository<Paciente, UUID> {
     List<Paciente> findByEmpresaIdOrderByNomeAsc(UUID empresaId);
+
+    List<Paciente> findByEmpresaIdAndStatusPagamentoOrderByNomeAsc(UUID empresaId, String statusPagamento);
     
+    /** Lista apenas pacientes vinculados ao usuário via paciente_acessos */
+    @Query("""
+            SELECT DISTINCT p FROM Paciente p
+            WHERE p.empresa.id = :empresaId
+              AND EXISTS (SELECT 1 FROM PacienteAcesso a WHERE a.paciente = p AND a.usuario.id = :usuarioId)
+            ORDER BY p.nome ASC
+            """)
+    List<Paciente> findByEmpresaIdAndUsuarioIdOrderByNomeAsc(
+            @Param("empresaId") UUID empresaId,
+            @Param("usuarioId") UUID usuarioId);
+
     @Query("SELECT p FROM Paciente p WHERE p.empresa.id = :empresaId AND " +
            "(LOWER(p.nome) LIKE LOWER(CONCAT('%', :busca, '%')) OR " +
            "LOWER(p.telefone) LIKE LOWER(CONCAT('%', :busca, '%')) OR " +
            "LOWER(p.cpf) LIKE LOWER(CONCAT('%', :busca, '%'))) " +
            "ORDER BY p.nome ASC")
     List<Paciente> buscarPorEmpresaETexto(@Param("empresaId") UUID empresaId, @Param("busca") String busca);
-    
-    List<Paciente> findByEmpresaIdAndStatusPagamentoOrderByNomeAsc(UUID empresaId, String statusPagamento);
 
-    @Query("SELECT p FROM Paciente p WHERE p.empresa.id = :empresaId " +
-           "AND p.dataNascimento = :dataNascimento " +
-           "AND p.telefone LIKE CONCAT('%', :telefone, '%')")
-    Optional<Paciente> findByEmpresaIdAndDataNascimentoAndTelefone(
+    /** Busca filtrando apenas por usuário via paciente_acessos */
+    @Query("""
+            SELECT DISTINCT p FROM Paciente p
+            WHERE p.empresa.id = :empresaId
+              AND EXISTS (SELECT 1 FROM PacienteAcesso a WHERE a.paciente = p AND a.usuario.id = :usuarioId)
+              AND (LOWER(p.nome) LIKE LOWER(CONCAT('%', :busca, '%'))
+                   OR LOWER(p.telefone) LIKE LOWER(CONCAT('%', :busca, '%'))
+                   OR LOWER(p.cpf) LIKE LOWER(CONCAT('%', :busca, '%')))
+            ORDER BY p.nome ASC
+            """)
+    List<Paciente> buscarPorEmpresaUsuarioETexto(
             @Param("empresaId") UUID empresaId,
-            @Param("dataNascimento") LocalDate dataNascimento,
-            @Param("telefone") String telefone);
+            @Param("usuarioId") UUID usuarioId,
+            @Param("busca") String busca);
 }

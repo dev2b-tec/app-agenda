@@ -5,7 +5,6 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.UUID;
-
 @Data
 public class PacienteDto {
     private UUID id;
@@ -35,8 +34,6 @@ public class PacienteDto {
     private String statusPagamento;
     private Integer sessoes;
     private String fotoUrl;
-    private UUID usuarioId;
-    private String usuarioNome;
 
     public static PacienteDto from(Paciente p) {
         PacienteDto dto = new PacienteDto();
@@ -67,10 +64,6 @@ public class PacienteDto {
         dto.statusPagamento = p.getStatusPagamento();
         dto.sessoes = p.getSessoes();
         dto.fotoUrl = p.getFotoUrl();
-        if (p.getUsuario() != null) {
-            dto.usuarioId = p.getUsuario().getId();
-            dto.usuarioNome = p.getUsuario().getNome();
-        }
         return dto;
     }
 }
